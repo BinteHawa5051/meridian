@@ -21,11 +21,12 @@
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
+    "compilerOptions": {
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./*"]
+  }
+},
     "target": "ES2017",
     "forceConsistentCasingInFileNames": true
   },
