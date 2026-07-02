@@ -2,7 +2,7 @@
 node_modules/
 .venv/
 
-# Environment files — NEVER commit these, they contain DB credentials
+# Environment files — NEVER commit, they contain real credentials
 .env
 .env.local
 .env.*.local
@@ -14,17 +14,18 @@ dashboard/out/
 
 # Logs
 *.log
-api.log
-worker.log
 
-# OS
-.DS_Store
-Thumbs.db
+# Archives
+*.zip
 
 # TypeScript build cache
 *.tsbuildinfo
 dashboard/tsconfig.tsbuildinfo
 
-# Misc
+# OS
+.DS_Store
+Thumbs.db
 nul
-*.zip
+
+# Editor
+.vscode/
