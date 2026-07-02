@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Environment files — NEVER commit these, they contain DB credentials
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Next.js build output
+dashboard/.next/
+dashboard/out/
+
+# Logs
+*.log
+api.log
+worker.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript build cache
+*.tsbuildinfo
+dashboard/tsconfig.tsbuildinfo
+
+# Misc
+nul
+*.zip

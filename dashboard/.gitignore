@@ -1,0 +1,14 @@
+# Env — contains real DB credentials
+.env.local
+.env.*.local
+.env.production
+
+# Build
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Cache
+tsconfig.tsbuildinfo
