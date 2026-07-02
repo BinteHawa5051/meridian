@@ -1,14 +1,18 @@
 {
-  "name": "files",
+  "name": "meridian-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Meridian backend services — ingest API, worker, cron jobs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:api":    "npx tsx meridian-ingest-api.ts",
+    "dev:worker": "npx tsx meridian-worker.ts",
+    "migrate":    "node apply-schema-core.js",
+    "seed":       "node seed-auth.js",
+    "test:ingest":"node test-ingest.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
