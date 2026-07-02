@@ -8,9 +8,15 @@ node_modules/
 .env.*.local
 .env.production
 
-# Next.js build output
+# Next.js build output (root-level after dashboard merge)
+.next/
+out/
+
+# Also ignore old dashboard subfolder build artifacts
 dashboard/.next/
 dashboard/out/
+dashboard/node_modules/
+dashboard/tsconfig.tsbuildinfo
 
 # Logs
 *.log
@@ -20,7 +26,6 @@ dashboard/out/
 
 # TypeScript build cache
 *.tsbuildinfo
-dashboard/tsconfig.tsbuildinfo
 
 # OS
 .DS_Store
