@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel-build": "node -e \"const p=require('./package.json');if(!p.dependencies.next)throw new Error('Wrong package.json!');\" && next build"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
