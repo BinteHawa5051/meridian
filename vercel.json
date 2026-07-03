@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm install",
+  "installCommand": "echo 'CWD:' && pwd && ls package.json && npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": ".next",
   "regions": ["iad1"]
