@@ -2,7 +2,7 @@
 
 > Set budgets that actually block calls. Meter usage your customers can audit. Bill them for it automatically.
 
-Meridian is a full-stack AI cost control plane that sits between your application and LLM providers. It enforces spend limits in real-time, attributes costs per customer, and handles Stripe billing passthrough automatically.
+Meridian is a full-stack AI cost control plane. It sits between your application and LLM providers (OpenAI, Anthropic, Google), enforces spend limits in real-time, attributes costs per customer, and handles Stripe billing passthrough automatically.
 
 ---
 
@@ -10,7 +10,7 @@ Meridian is a full-stack AI cost control plane that sits between your applicatio
 
 On every wrapped LLM call, Meridian:
 
-1. **Checks the budget** (Redis, <2ms) — blocks or routes to fallback if cap is hit
+1. **Checks the budget** (Redis, <2ms) — blocks or routes to a fallback model if the cap is hit
 2. **Calls the LLM** — original request, unmodified
 3. **Computes cost** — tokens × live model pricing, cached tokens at discounted rate
 4. **Decrements counters** — Redis INCRBYFLOAT, daily and monthly windows
@@ -18,26 +18,20 @@ On every wrapped LLM call, Meridian:
 
 ---
 
-## Screenshots
-
-| Dashboard | Customers | Budgets |
-|---|---|---|
-| KPI cards, charts, heatmap | Profitability table, CSV export | Rules, usage bars, inline create |
-
----
-
-## Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
+| Dashboard | Next.js 14 App Router + TypeScript |
+| Styling | Tailwind CSS + Radix UI primitives |
+| Charts | Recharts |
+| Animations | Framer Motion |
+| State | Zustand (UI) + TanStack Query (server) |
 | Ingest API | Fastify (Node.js) — p99 <20ms |
 | Queue | BullMQ + Redis |
 | Worker | Node.js — cost compute, DB write, Stripe emit |
-| Time-series DB | TimescaleDB via Neon |
+| Database | TimescaleDB via Neon (PostgreSQL) |
 | Cache | Redis via Upstash |
-| Dashboard | Next.js 14 App Router + Tailwind CSS |
-| Charts | Recharts |
-| Animations | Framer Motion |
 | Email alerts | Resend |
 | Billing | Stripe Meter Events |
 | AI features | Anthropic Claude Haiku (anomaly detection) |
@@ -49,35 +43,91 @@ On every wrapped LLM call, Meridian:
 
 ```
 meridian/
-├── dashboard/                  # Next.js frontend (deploy to Vercel)
-│   ├── app/                    # App Router pages
-│   │   ├── dashboard/          # Main dashboard
-│   │   ├── customers/          # Customer profitability
-│   │   ├── usage/              # Token & cost analytics
-│   │   ├── models/             # Model usage + pricing
-│   │   ├── budgets/            # Budget rules management
-│   │   ├── alerts/             # Alert rules (email/slack/webhook)
-│   │   ├── policies/           # Routing policies
-│   │   ├── billing/            # Stripe meter events & revenue
-│   │   ├── reports/            # Exportable CSV reports
-│   │   ├── api-keys/           # Key creation & revocation
-│   │   ├── integrations/       # Provider connections
-│   │   ├── settings/           # Org & profile settings
-│   │   └── api/meridian/       # Next.js API routes (DB-backed)
-│   ├── components/             # UI components
-│   ├── hooks/                  # TanStack Query hooks
-│   ├── lib/                    # DB client, cache, utils, types
-│   └── store/                  # Zustand state (sidebar, date range)
 │
-├── meridian-ingest-api.ts      # Fastify ingest service (port 3001)
-├── meridian-worker.ts          # BullMQ worker — cost compute + Stripe
-├── meridian-anomaly.ts         # Cron — AI-powered spend anomaly detection
-├── meridian-sdk.ts             # Node.js SDK — wraps OpenAI client
-├── meridian-schema.sql         # Full TimescaleDB schema + migrations
-├── meridian-pricing-updater.ts # Cron — syncs model prices from OpenRouter
-├── meridian-retention.ts       # Cron — per-plan data retention purge
-├── meridian-stripe-retry.ts    # Cron — retries failed Stripe meter events
-├── .env.example                # Environment variable template
+├── app/                            # Next.js App Router pages
+│   ├── dashboard/                  # Main dashboard (KPIs, charts, activity)
+│   ├── customers/                  # Customer profitability table
+│   ├── usage/                      # Token & cost analytics
+│   ├── models/                     # Model usage + pricing table
+│   ├── budgets/                    # Budget rule management
+│   ├── alerts/                     # Alert rules (email/Slack/webhook)
+│   ├── policies/                   # Routing policies
+│   ├── billing/                    # Stripe meter events & revenue
+│   ├── reports/                    # Exportable CSV reports
+│   ├── api-keys/                   # Key creation & revocation
+│   ├── integrations/               # Provider connections
+│   ├── settings/                   # Org & profile settings
+│   └── api/meridian/               # Next.js API routes (DB-backed)
+│       ├── dashboard/              # Combined dashboard data (1 request)
+│       ├── summary/                # KPI cards
+│       ├── timeseries/             # Daily spend by provider
+│       ├── breakdown/              # Cost by model & provider
+│       ├── margin/                 # Customer profitability
+│       ├── customers/              # Customer list
+│       ├── budgets/                # Budget rules + Redis counters
+│       ├── activity/               # Recent events
+│       ├── alerts/                 # Alert rules CRUD
+│       ├── api-keys/               # Key management
+│       ├── billing/                # Stripe meter events
+│       ├── models/                 # Model usage
+│       ├── pricing/                # Model pricing table
+│       ├── revenue/                # Monthly revenue
+│       ├── stacked-bar/            # Provider breakdown (weekly)
+│       ├── heatmap/                # Request heatmap
+│       └── status/                 # System health
+│
+├── components/
+│   ├── layout/
+│   │   ├── Shell.tsx               # Page wrapper (sidebar + topnav)
+│   │   ├── Sidebar.tsx             # Collapsible navigation
+│   │   └── TopNav.tsx              # Search, notifications, profile
+│   ├── dashboard/
+│   │   ├── KpiCards.tsx            # 6 animated metric cards
+│   │   ├── charts/                 # Recharts wrappers
+│   │   ├── customers/              # Profitability table
+│   │   ├── budget/                 # Budget enforcement cards
+│   │   ├── activity/               # Live activity feed
+│   │   ├── breakdown/              # Cost breakdown panel
+│   │   ├── routing/                # AI routing flow diagram
+│   │   └── status/                 # System status indicators
+│   └── ui/                         # Radix UI primitives (badge, button, card…)
+│
+├── hooks/
+│   ├── useDashboard.ts             # Single hook — fetches all dashboard data
+│   └── useMeridianData.ts          # Individual hooks per endpoint
+│
+├── lib/
+│   ├── db.ts                       # PostgreSQL pool (singleton)
+│   ├── cache.ts                    # In-process TTL cache for API routes
+│   ├── api-client.ts               # Typed fetch wrappers + mock fallback
+│   ├── mock-data.ts                # Deterministic seeded mock data
+│   ├── types.ts                    # Shared TypeScript types
+│   ├── constants.ts                # Sidebar items, chart colours
+│   └── utils.ts                    # formatCurrency, cn, formatRelativeTime…
+│
+├── store/
+│   └── useDashboardStore.ts        # Zustand — sidebar state + date range
+│
+├── meridian-ingest-api.ts          # Fastify ingest service (port 3001)
+├── meridian-worker.ts              # BullMQ worker — cost compute + Stripe
+├── meridian-anomaly.ts             # Cron — AI spend anomaly detection
+├── meridian-sdk.ts                 # Node.js SDK — wraps OpenAI client
+├── meridian-schema.sql             # Full TimescaleDB schema + migrations
+├── meridian-pricing-updater.ts     # Cron — syncs model prices from OpenRouter
+├── meridian-retention.ts           # Cron — per-plan data retention purge
+├── meridian-stripe-retry.ts        # Cron — retries failed Stripe meter events
+│
+├── apply-schema-core.js            # Run DB migrations (setup script)
+├── seed-auth.js                    # Create first org + API key
+├── test-ingest.js                  # Smoke test for the ingest API
+├── verify-worker-schema.js         # Verify DB tables exist
+│
+├── package.json                    # Dashboard + build dependencies
+├── next.config.mjs                 # Next.js config
+├── tailwind.config.ts              # Tailwind theme (meridian- colour tokens)
+├── tsconfig.json                   # TypeScript config (@/ path alias)
+├── vercel.json                     # Vercel deployment config
+├── .env.example                    # Environment variable template
 └── README.md
 ```
 
@@ -91,34 +141,35 @@ meridian/
 git clone https://github.com/BinteHawa5051/meridian.git
 cd meridian
 npm install
-cd dashboard && npm install
 ```
 
 ### 2. Set up environment variables
 
 ```bash
 cp .env.example .env.local
-# Fill in your DATABASE_URL, REDIS_URL, STRIPE_SECRET_KEY etc.
-
-cp .env.example dashboard/.env.local
-# Same values — dashboard needs DATABASE_URL and REDIS_URL too
+# Fill in DATABASE_URL, REDIS_URL, STRIPE_SECRET_KEY etc.
 ```
 
 ### 3. Run database migrations
 
 ```bash
-# Connect to your Neon database and run:
-psql $DATABASE_URL -f meridian-schema.sql
+node apply-schema-core.js
 ```
 
-### 4. Start the dashboard
+### 4. Seed first org and API key
 
 ```bash
-cd dashboard
+node seed-auth.js
+# Prints your orgId and API key
+```
+
+### 5. Start the dashboard
+
+```bash
 npm run dev        # http://localhost:3000
 ```
 
-### 5. Start the backend (optional — dashboard works with mock data without it)
+### 6. Start the backend (optional)
 
 ```bash
 # Terminal 1 — Ingest API
@@ -132,18 +183,18 @@ npx tsx meridian-worker.ts
 
 ## Dashboard Pages
 
-| Page | Path | Description |
+| Page | Route | Description |
 |---|---|---|
-| Dashboard | `/dashboard` | KPI cards, spend charts, customer table, live activity |
+| Dashboard | `/dashboard` | KPI cards, spend charts, heatmap, activity feed |
 | Customers | `/customers` | Profitability table, search, filter, CSV export |
 | Usage | `/usage` | Cost over time, requests, provider breakdown, heatmap |
 | Models | `/models` | Usage by model + live pricing table |
-| Budgets | `/budgets` | Budget rules, usage bars, create/manage |
+| Budgets | `/budgets` | Budget rules, usage bars, inline create form |
 | Alerts | `/alerts` | Alert rules — email, Slack, webhook, PagerDuty |
-| Policies | `/policies` | Routing policies — fallback models on breach |
+| Policies | `/policies` | Model routing policies on budget/latency breach |
 | Billing | `/billing` | Revenue chart, Stripe meter event audit trail |
 | Reports | `/reports` | Download 5 CSV reports for any date range |
-| API Keys | `/api-keys` | Create, display, revoke API keys |
+| API Keys | `/api-keys` | Create, display prefix, revoke keys |
 | Integrations | `/integrations` | LLM provider + service connections |
 | Settings | `/settings` | Org, profile, notifications, security |
 
@@ -155,7 +206,7 @@ npx tsx meridian-worker.ts
 import { Meridian } from './meridian-sdk';
 import OpenAI from 'openai';
 
-// Wrap your existing OpenAI client — zero other changes needed
+// Wrap your existing OpenAI client — one line change
 const ai = Meridian.wrap(new OpenAI(), {
   apiKey: process.env.MERIDIAN_API_KEY,
 });
@@ -169,7 +220,7 @@ await ai.budgets.set({
   fallbackModel: 'gpt-4o-mini',
 });
 
-// Your existing code — unchanged
+// Your existing code unchanged
 const res = await ai.chat.completions.create({
   model:    'gpt-4o',
   messages: [{ role: 'user', content: prompt }],
@@ -183,20 +234,21 @@ const res = await ai.chat.completions.create({
 
 ### Dashboard → Vercel
 
-1. Go to [vercel.com/new](https://vercel.com/new) and import this repo
-2. Set **Root Directory** to `dashboard`
-3. Add environment variables: `DATABASE_URL`, `REDIS_URL`, `NODE_ENV=production`
-4. Deploy
+1. Go to [vercel.com/new](https://vercel.com/new) → Import `BinteHawa5051/meridian`
+2. **Root Directory** — leave blank
+3. **Node.js Version** — 20.x
+4. Add environment variables (see below)
+5. Deploy
 
 ### Backend → Railway
 
-1. Create a new Railway project
-2. Add three services: `ingest-api`, `worker`, `anomaly-cron`
-3. Set start commands:
-   - Ingest API: `npx tsx meridian-ingest-api.ts`
-   - Worker: `npx tsx meridian-worker.ts`
-   - Anomaly cron: `npx tsx meridian-anomaly.ts` (schedule every 15 min)
-4. Add all environment variables from `.env.example`
+Create 3 services with these start commands:
+
+| Service | Command |
+|---|---|
+| Ingest API | `npx tsx meridian-ingest-api.ts` |
+| Worker | `npx tsx meridian-worker.ts` |
+| Anomaly Cron | `npx tsx meridian-anomaly.ts` |
 
 ---
 
@@ -217,13 +269,11 @@ const res = await ai.chat.completions.create({
 
 ## Cron Jobs
 
-Schedule these on Railway or any cron service:
-
 | Script | Schedule | Purpose |
 |---|---|---|
-| `meridian-anomaly.ts` | `*/15 * * * *` | AI spend anomaly detection |
-| `meridian-pricing-updater.ts` | `0 2 * * 1` | Weekly model price sync |
-| `meridian-retention.ts` | `0 3 * * *` | Nightly data retention purge |
+| `meridian-anomaly.ts` | `*/15 * * * *` | AI-powered spend anomaly detection |
+| `meridian-pricing-updater.ts` | `0 2 * * 1` | Weekly model price sync from OpenRouter |
+| `meridian-retention.ts` | `0 3 * * *` | Nightly data retention purge per plan |
 | `meridian-stripe-retry.ts` | `*/15 * * * *` | Retry failed Stripe meter events |
 
 ---
@@ -238,8 +288,6 @@ Schedule these on Railway or any cron service:
 | Upstash Redis | ~$10 |
 | Resend email | Free (3K/mo) |
 | **Total** | **~$49/mo** |
-
-First paying customer at $99/mo covers 2× infrastructure.
 
 ---
 
