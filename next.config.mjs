@@ -10,6 +10,14 @@ const nextConfig = {
       "recharts",
     ],
   },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': __dirname,
+      '@components': __dirname + '/components',
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

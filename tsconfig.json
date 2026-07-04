@@ -22,18 +22,13 @@
         "name": "next"
       }
     ],
-
     "baseUrl": ".",
-
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"]
     },
-
     "forceConsistentCasingInFileNames": true
   },
-
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -41,12 +36,6 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "dashboard",
-    "meridian-*.ts",
-    "seed-auth.js",
-    "apply-schema-core.js",
-    "test-ingest.js",
-    "verify-worker-schema.js"
+    "node_modules"
   ]
 }
