@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileUpload } from "@/components/ui/file-upload";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import {
   Settings, Building2, User, Bell, Shield,
@@ -69,13 +71,13 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [saved, setSaved] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
-
-  // Org settings state
   const [orgName, setOrgName] = React.useState("Acme Corp");
   const [orgSlug, setOrgSlug] = React.useState("acme-corp");
-  const [plan, setPlan] = React.useState("enterprise");
+  const [plan] = React.useState("enterprise");
+  const [avatarUrl, setAvatarUrl] = React.useState("");
 
   // Notification preferences
   const [notifs, setNotifs] = React.useState({
@@ -203,15 +205,23 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <Section title="Personal Details" description="Your name and contact info">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="text-[11px] text-meridian-text-muted mb-1 block">Full Name</label>
-                    <Input className={inputClass} defaultValue="Tooba Akram" />
+                    <Input className={inputClass} defaultValue={user?.name ?? "Admin"} />
                   </div>
                   <div>
                     <label className="text-[11px] text-meridian-text-muted mb-1 block">Email</label>
-                    <Input className={inputClass} defaultValue="admin@acme.com" type="email" />
+                    <Input className={inputClass} defaultValue={user?.email ?? ""} type="email" />
                   </div>
+                </div>
+                <div>
+                  <label className="text-[11px] text-meridian-text-muted mb-1 block">Profile Picture</label>
+                  <FileUpload
+                    value={avatarUrl}
+                    onChange={setAvatarUrl}
+                    label="Upload profile picture"
+                  />
                 </div>
               </Section>
               <Section title="Role" description="Your role in the organisation">

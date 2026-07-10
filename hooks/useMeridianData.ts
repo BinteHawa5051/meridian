@@ -135,11 +135,11 @@ export function useHeatmap() {
   });
 }
 
-export function useCustomers(search = "") {
+export function useCustomers(search = "", page = 1, limit = 20) {
   const r = useCurrentRange();
   return useQuery<CustomersResponse>({
-    queryKey: ["meridian", "customers", r, search],
-    queryFn:  () => meridianApi.getCustomers(r, search),
+    queryKey: ["meridian", "customers", r, search, page, limit],
+    queryFn:  () => meridianApi.getCustomers(r, search, page, limit),
     staleTime: S.margin, retry: RETRY, retryDelay: RETRY_DELAY,
   });
 }

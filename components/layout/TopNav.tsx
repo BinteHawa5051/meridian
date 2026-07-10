@@ -16,6 +16,7 @@ import {
   Key, User, ExternalLink, AlertTriangle,
   CheckCircle2, X,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 // ─── Date ranges ──────────────────────────────────────────────────────────────
 
@@ -97,6 +98,7 @@ function Dropdown({
 
 export function TopNav() {
   const router = useRouter();
+  const { user, logout } = useAuth();
   const { sidebarCollapsed, dateRange, setDateRange } = useDashboardStore();
 
   // Search
@@ -372,17 +374,21 @@ export function TopNav() {
               aria-label="User menu"
             >
               <Avatar className="w-7 h-7">
-                <AvatarFallback className="text-[10px] bg-[#7A1F34] text-white">TA</AvatarFallback>
+                <AvatarFallback className="text-[10px] bg-[#7A1F34] text-white">
+                  {user ? user.name.slice(0,2).toUpperCase() : "?"}
+                </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:block text-xs font-medium text-[#A1A1AA]">Tooba</span>
+              <span className="hidden sm:block text-xs font-medium text-[#A1A1AA]">
+                {user?.name.split(" ")[0] ?? "Account"}
+              </span>
               <ChevronDown className="w-3 h-3 text-[#71717A] hidden sm:block" />
             </button>
             <div className="w-56">
               {/* Profile header */}
               <div className="px-4 py-3 border-b border-[#27272a]">
-                <p className="text-sm font-semibold text-[#F5F5F5]">Tooba Akram</p>
-                <p className="text-xs text-[#71717A] mt-0.5">admin@acme.com</p>
-                <Badge variant="primary" className="mt-1.5 text-[10px]">Admin</Badge>
+                <p className="text-sm font-semibold text-[#F5F5F5]">{user?.name ?? "Account"}</p>
+                <p className="text-xs text-[#71717A] mt-0.5">{user?.email ?? ""}</p>
+                <Badge variant="primary" className="mt-1.5 text-[10px] capitalize">{user?.role ?? "user"}</Badge>
               </div>
               {/* Menu items */}
               <div className="p-1.5">
@@ -423,8 +429,7 @@ export function TopNav() {
                 <button
                   onClick={() => {
                     setProfileOpen(false);
-                    // Redirect to login when auth is wired up
-                    router.push("/");
+                    logout();
                   }}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#EF4444]/10 transition-colors w-full text-left"
                 >

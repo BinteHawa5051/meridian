@@ -3,6 +3,7 @@
 import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/lib/auth-context";
 
 // Single QueryClient instance across the whole app.
 // gcTime: how long unused cache entries stay in memory (5 min).
@@ -35,9 +36,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider delayDuration={200}>
-        {children}
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider delayDuration={200}>
+          {children}
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

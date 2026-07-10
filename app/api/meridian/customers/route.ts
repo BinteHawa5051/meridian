@@ -6,8 +6,11 @@ import { generateCustomerData } from "@/lib/mock-data";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const range = searchParams.get("range") ?? "30d";
+  const range  = searchParams.get("range")  ?? "30d";
   const search = searchParams.get("search") ?? "";
+  const page   = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+  const limit  = Math.min(50, parseInt(searchParams.get("limit") ?? "20"));
+  const offset = (page - 1) * limit;
 
   const intervalMap: Record<string, string> = {
     "7d": "7 days", "30d": "30 days", "90d": "90 days", "12m": "365 days",
@@ -20,23 +23,19 @@ export async function GET(req: NextRequest) {
       plan_tier: string; active: boolean; stripe_customer_id: string | null;
       markup: string; created_at: string;
       revenue: string; ai_cost: string; profit: string; margin: string; requests: string;
+      total_count: string;
     }>(`
       SELECT
-        c.id,
-        c.external_id,
-        c.display_name,
-        c.plan_tier,
-        c.active,
-        c.stripe_customer_id,
-        c.markup,
-        c.created_at,
+        c.id, c.external_id, c.display_name, c.plan_tier, c.active,
+        c.stripe_customer_id, c.markup, c.created_at,
         COALESCE(SUM(d.total_cost + d.total_markup), 0) AS revenue,
         COALESCE(SUM(d.total_cost), 0)                  AS ai_cost,
         COALESCE(SUM(d.total_markup), 0)                AS profit,
         CASE WHEN SUM(d.total_cost + d.total_markup) = 0 THEN 0
              ELSE ROUND(SUM(d.total_markup) / NULLIF(SUM(d.total_cost + d.total_markup), 0) * 100, 2)
         END AS margin,
-        COALESCE(SUM(d.request_count), 0)               AS requests
+        COALESCE(SUM(d.request_count), 0)               AS requests,
+        COUNT(*) OVER()                                  AS total_count
       FROM customers c
       LEFT JOIN cost_by_day d ON d.customer_id = c.id
         AND d.bucket >= NOW() - INTERVAL '${interval}'
@@ -48,7 +47,7 @@ export async function GET(req: NextRequest) {
       GROUP BY c.id, c.external_id, c.display_name, c.plan_tier,
                c.active, c.stripe_customer_id, c.markup, c.created_at
       ORDER BY revenue DESC
-      LIMIT 100
+      LIMIT ${limit} OFFSET ${offset}
     `, [search]);
 
     const customers = rows.map((r) => {
@@ -76,7 +75,16 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ customers, generatedAt: new Date().toISOString() });
+    return NextResponse.json({
+      customers,
+      pagination: {
+        page,
+        limit,
+        total: parseInt(rows[0]?.total_count ?? "0"),
+        totalPages: Math.ceil(parseInt(rows[0]?.total_count ?? "0") / limit),
+      },
+      generatedAt: new Date().toISOString(),
+    });
   } catch (err) {
     console.error("[/api/meridian/customers] DB error, falling back to mock:", err);
     return NextResponse.json({

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CustomerTable } from "@/components/dashboard/customers/CustomerTable";
+import { Pagination } from "@/components/ui/pagination";
 import { useCustomers } from "@/hooks/useMeridianData";
 import type { FullCustomer } from "@/lib/api-client";
 import { formatCurrency, formatCompactNumber, cn } from "@/lib/utils";
@@ -103,15 +104,18 @@ export default function CustomersPage() {
   const [search, setSearch] = React.useState("");
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<"all" | "active" | "at-risk" | "churned">("all");
+  const [page, setPage] = React.useState(1);
+  const PAGE_SIZE = 20;
 
   // Debounce search input
   React.useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    const t = setTimeout(() => { setDebouncedSearch(search); setPage(1); }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
-  const { data, isLoading, isFetching, refetch } = useCustomers(debouncedSearch);
+  const { data, isLoading, isFetching, refetch } = useCustomers(debouncedSearch, page, PAGE_SIZE);
   const customers: FullCustomer[] = data?.customers ?? [];
+  const pagination = (data as any)?.pagination;
 
   // Client-side status filter
   const filtered = React.useMemo(() => {
@@ -311,6 +315,17 @@ export default function CustomersPage() {
             )}
 
             <CustomerTable customers={filtered} isLoading={isLoading} />
+
+            {/* Pagination */}
+            {!isLoading && pagination && (
+              <Pagination
+                page={page}
+                totalPages={pagination.totalPages}
+                total={pagination.total}
+                limit={PAGE_SIZE}
+                onChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              />
+            )}
 
             {/* Empty state */}
             {!isLoading && filtered.length === 0 && (

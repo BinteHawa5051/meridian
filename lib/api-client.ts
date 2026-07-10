@@ -141,10 +141,12 @@ export const meridianApi = {
     return fetchJson<MarginResponse>(withRange(`${API_BASE}/margin`, range));
   },
 
-  async getCustomers(range?: DateRange, search?: string): Promise<CustomersResponse> {
+  async getCustomers(range?: DateRange, search?: string, page = 1, limit = 20): Promise<CustomersResponse> {
     const params = new URLSearchParams();
-    if (range)  params.set("range", range);
-    if (search) params.set("search", search);
+    if (range)       params.set("range",  range);
+    if (search)      params.set("search", search);
+    if (page > 1)    params.set("page",   String(page));
+    if (limit !== 20) params.set("limit", String(limit));
     const qs = params.toString();
     return fetchJson<CustomersResponse>(`${API_BASE}/customers${qs ? `?${qs}` : ""}`);
   },
