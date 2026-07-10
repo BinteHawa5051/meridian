@@ -7,6 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_ITEMS } from "@/lib/constants";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAuth } from "@/lib/auth-context";
+import { canAccess } from "@/lib/rbac";
+import type { Role } from "@/lib/rbac";
 import {
   ChevronLeft, ChevronRight, LayoutDashboard,
   Users, BarChart3, Brain, Wallet, Shield, Bell,
@@ -33,6 +36,7 @@ const iconMap: Record<string, React.ElementType> = {
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar } = useDashboardStore();
+  const { user, logout } = useAuth();
   const [orgExpanded, setOrgExpanded] = React.useState(true);
 
   return (
@@ -71,21 +75,22 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1 scrollbar-hide">
-        {SIDEBAR_ITEMS.map((item, index) => {
+        {SIDEBAR_ITEMS.map((item) => {
           const Icon = iconMap[item.icon] || LayoutDashboard;
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          const allowed  = canAccess(user?.role as Role | undefined, item.href);
 
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={allowed ? item.href : "#"}>
               <motion.div
                 className={cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer group",
-                  isActive
-                    ? "text-white"
-                    : "text-meridian-text-muted hover:text-meridian-text-primary hover:bg-meridian-bg-hover"
+                  isActive ? "text-white" :
+                  !allowed ? "text-meridian-text-muted/40 cursor-not-allowed" :
+                  "text-meridian-text-muted hover:text-meridian-text-primary hover:bg-meridian-bg-hover"
                 )}
-                whileHover={{ x: 2 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={allowed ? { x: 2 } : {}}
+                whileTap={allowed ? { scale: 0.98 } : {}}
               >
                 {isActive && (
                   <motion.div
@@ -200,8 +205,8 @@ export function Sidebar() {
                   exit={{ opacity: 0 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-sm font-medium text-meridian-text-primary truncate">Tooba Akram</p>
-                  <p className="text-[11px] text-meridian-text-muted truncate">Admin</p>
+                  <p className="text-sm font-medium text-meridian-text-primary truncate">{user?.name ?? "Account"}</p>
+                  <p className="text-[11px] text-meridian-text-muted truncate capitalize">{user?.role ?? "user"}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -219,7 +224,7 @@ export function Sidebar() {
                   href="/"
                   className="p-1 rounded-md hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
                   aria-label="Sign out"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); logout(); }}
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </Link>

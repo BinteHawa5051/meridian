@@ -57,18 +57,19 @@ export type {
 
 // ─── Static Constants ────────────────────────────────────
 export const SIDEBAR_ITEMS = [
-  { label: "Dashboard", icon: "LayoutDashboard", href: "/dashboard" },
-  { label: "Customers", icon: "Users", href: "/customers" },
-  { label: "Usage", icon: "BarChart3", href: "/usage" },
-  { label: "Models", icon: "Brain", href: "/models" },
-  { label: "Budgets", icon: "Wallet", href: "/budgets" },
-  { label: "Policies", icon: "Shield", href: "/policies" },
-  { label: "Alerts", icon: "Bell", href: "/alerts" },
-  { label: "Billing", icon: "CreditCard", href: "/billing" },
-  { label: "API Keys", icon: "Key", href: "/api-keys" },
-  { label: "Reports", icon: "FileText", href: "/reports" },
-  { label: "Integrations", icon: "Puzzle", href: "/integrations" },
-  { label: "Settings", icon: "Settings", href: "/settings" },
+  { label: "Dashboard",    icon: "LayoutDashboard", href: "/dashboard" },
+  { label: "Customers",    icon: "Users",           href: "/customers"  },
+  { label: "Usage",        icon: "BarChart3",        href: "/usage"      },
+  { label: "Models",       icon: "Brain",            href: "/models"     },
+  { label: "Budgets",      icon: "Wallet",           href: "/budgets"    },
+  { label: "Policies",     icon: "Shield",           href: "/policies"   },
+  { label: "Alerts",       icon: "Bell",             href: "/alerts"     },
+  { label: "Billing",      icon: "CreditCard",       href: "/billing"    },
+  { label: "API Keys",     icon: "Key",              href: "/api-keys"   },
+  { label: "Team",         icon: "Users",            href: "/team"       },
+  { label: "Reports",      icon: "FileText",         href: "/reports"    },
+  { label: "Integrations", icon: "Puzzle",           href: "/integrations" },
+  { label: "Settings",     icon: "Settings",         href: "/settings"   },
 ];
 
 export const CHART_COLORS = [
