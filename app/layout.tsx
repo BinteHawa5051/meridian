@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body>
+      <body style={{ backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
         <Providers>{children}</Providers>
       </body>
     </html>

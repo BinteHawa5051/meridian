@@ -11,10 +11,32 @@ const config: Config = {
     extend: {
       colors: {
         meridian: {
-          bg: { primary: "#09090B", secondary: "#0E0E10", tertiary: "#111113", card: "#141416", hover: "#1A1A1D" },
-          burgundy: { DEFAULT: "#7A1F34", light: "#8E243D", bright: "#A52D4F", glow: "#7A1F3420" },
-          text: { primary: "#F5F5F5", secondary: "#A1A1AA", muted: "#71717A", accent: "#E4E4E7" },
-          border: { DEFAULT: "#27272A", subtle: "#1F1F23" },
+          bg: {
+            DEFAULT:   "var(--bg-base)",
+            primary:   "var(--bg-base)",
+            secondary: "var(--bg-hover)",
+            tertiary:  "var(--bg-hover)",
+            card:      "var(--bg-card)",
+            hover:     "var(--bg-hover)",
+            elevation: "var(--bg-elevation)",
+          },
+          burgundy: {
+            DEFAULT: "var(--burgundy)",
+            light:   "#8E243D",
+            bright:  "var(--burgundy-bright)",
+            glow:    "#7A1F3420",
+          },
+          text: {
+            primary:   "var(--text-primary)",
+            secondary: "var(--text-secondary)",
+            muted:     "var(--text-muted)",
+            accent:    "var(--text-secondary)",
+          },
+          border: {
+            DEFAULT: "var(--border)",
+            subtle:  "var(--border)",
+            light:   "var(--border-light)",
+          },
         },
         chart: {
           blue: "#3B82F6",

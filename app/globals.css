@@ -44,14 +44,45 @@
 }
 
 body {
-  background-color: #09090b;
-  color: #f5f5f5;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   font-family: "Geist", "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── CSS variables: dark mode (default) ──────────────────────────────────── */
+:root {
+  --bg-base:       #09090b;
+  --bg-card:       #141416;
+  --bg-hover:      #1a1a1d;
+  --bg-elevation:  #1a1a1d;
+  --border:        #27272a;
+  --border-light:  #3f3f46;
+  --text-primary:  #f5f5f5;
+  --text-secondary:#a1a1aa;
+  --text-muted:    #71717a;
+  --burgundy:      #7a1f34;
+  --burgundy-bright:#a52d4f;
+}
+
+/* ── CSS variables: light mode ───────────────────────────────────────────── */
+html:not(.dark) {
+  --bg-base:       #fafafa;
+  --bg-card:       #ffffff;
+  --bg-hover:      #f4f4f5;
+  --bg-elevation:  #ffffff;
+  --border:        #e4e4e7;
+  --border-light:  #d4d4d8;
+  --text-primary:  #09090b;
+  --text-secondary:#52525b;
+  --text-muted:    #71717a;
+  --burgundy:      #7a1f34;
+  --burgundy-bright:#a52d4f;
+}
+
 .mesh-bg {
+  background-color: var(--bg-base);
   background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(122, 31, 52, 0.08), transparent),
     radial-gradient(ellipse 50% 30% at 80% 80%, rgba(122, 31, 52, 0.04), transparent),
     radial-gradient(ellipse 30% 50% at 10% 60%, rgba(122, 31, 52, 0.03), transparent);
@@ -60,41 +91,29 @@ body {
 /* ── Component utilities ──────────────────────────────────────────────────── */
 @layer components {
   .glass-panel {
-    @apply rounded-card bg-meridian-bg-card border border-meridian-border shadow-card;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    @apply rounded-card shadow-card;
   }
 
   .glass-panel-hover {
-    @apply rounded-card bg-meridian-bg-card border border-meridian-border shadow-card
-           transition-all duration-300 hover:shadow-card-hover hover:border-white/[0.06];
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    @apply rounded-card shadow-card transition-all duration-300 hover:shadow-card-hover;
   }
 
   .skeleton {
-    @apply rounded-lg bg-meridian-bg-hover animate-pulse;
+    background-color: var(--bg-hover);
+    @apply rounded-lg animate-pulse;
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-meridian-text-primary via-meridian-text-accent to-meridian-text-secondary
-           bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-meridian-text-primary via-meridian-text-secondary to-meridian-text-secondary bg-clip-text text-transparent;
   }
 
-  /* Tailwind won't purge dynamic colour strings like `text-${color}`.
-     Declare every variant used in StatCard here so they're always emitted. */
-  .stat-green  { @apply bg-chart-green/10  text-chart-green; }
-  .stat-blue   { @apply bg-chart-blue/10   text-chart-blue; }
-  .stat-orange { @apply bg-chart-orange/10 text-chart-orange; }
-  .stat-red    { @apply bg-chart-red/10    text-chart-red; }
-
-  /* Elevation level above card (used by tooltips / dropdowns) */
-  .bg-meridian-bg-elevation {
-    background-color: #1a1a1d;
-  }
-  .bg-meridian-bg-hover {
-    background-color: #1a1a1d;
-  }
-  .bg-meridian-bg-card {
-    background-color: #141416;
-  }
-  .border-meridian-border-light {
-    border-color: #3f3f46;
-  }
+  /* Elevation */
+  .bg-meridian-bg-elevation { background-color: var(--bg-elevation); }
+  .bg-meridian-bg-hover     { background-color: var(--bg-hover);     }
+  .bg-meridian-bg-card      { background-color: var(--bg-card);      }
+  .border-meridian-border-light { border-color: var(--border-light); }
 }

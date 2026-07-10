@@ -118,9 +118,18 @@ export function TopNav() {
   // Dark mode toggle (visual only — already dark, could toggle class in future)
   const [isDark, setIsDark] = React.useState(true);
 
+  // Load saved preference + apply on mount
+  React.useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    const dark = saved !== "light";
+    setIsDark(dark);
+    document.documentElement.classList.toggle("dark", dark);
+  }, []);
+
   // Apply theme to <html> element
   React.useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark]);
 
   // Filtered search results
