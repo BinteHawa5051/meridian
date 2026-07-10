@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { formatCurrency, formatCompactNumber, cn } from "@/lib/utils";
 import {
   Users, Search, TrendingUp, TrendingDown,
   DollarSign, Activity, AlertTriangle, RefreshCw,
-  Download, UserPlus,
+  Download, UserPlus, X,
 } from "lucide-react";
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
@@ -106,6 +106,10 @@ export default function CustomersPage() {
   const [statusFilter, setStatusFilter] = React.useState<"all" | "active" | "at-risk" | "churned">("all");
   const [page, setPage] = React.useState(1);
   const PAGE_SIZE = 20;
+  const [showAddModal, setShowAddModal] = React.useState(false);
+  const [addForm, setAddForm] = React.useState({ externalId: "", displayName: "", planTier: "default", markup: "0" });
+  const [addSaving, setAddSaving] = React.useState(false);
+  const [addError, setAddError] = React.useState("");
 
   // Debounce search input
   React.useEffect(() => {
@@ -184,7 +188,7 @@ export default function CustomersPage() {
             <Download className="w-3.5 h-3.5 mr-1.5" />
             Export CSV
           </Button>
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="sm" onClick={() => setShowAddModal(true)}>
             <UserPlus className="w-3.5 h-3.5 mr-1.5" />
             Add Customer
           </Button>
@@ -346,6 +350,78 @@ export default function CustomersPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Add Customer Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#141416] border border-[#27272a] rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-base font-semibold text-meridian-text-primary">Add Customer</h2>
+                <button onClick={() => setShowAddModal(false)} className="text-meridian-text-muted hover:text-meridian-text-primary">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setAddSaving(true); setAddError("");
+                try {
+                  const res = await fetch("/api/meridian/customers", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...addForm, orgId: "00000000-0000-0000-0000-000000000000", markup: parseFloat(addForm.markup) / 100 }),
+                  });
+                  const d = await res.json();
+                  if (!res.ok) throw new Error(d.error ?? "Failed");
+                  setShowAddModal(false);
+                  refetch();
+                } catch (err: unknown) {
+                  setAddError(err instanceof Error ? err.message : "Failed");
+                } finally { setAddSaving(false); }
+              }} className="space-y-3">
+                <div>
+                  <label className="text-[11px] text-[#A1A1AA] mb-1 block">External ID *</label>
+                  <Input placeholder="cus_acme" value={addForm.externalId} onChange={(e) => setAddForm({ ...addForm, externalId: e.target.value })} className="h-9" required />
+                </div>
+                <div>
+                  <label className="text-[11px] text-[#A1A1AA] mb-1 block">Display Name</label>
+                  <Input placeholder="Acme Corp" value={addForm.displayName} onChange={(e) => setAddForm({ ...addForm, displayName: e.target.value })} className="h-9" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-[#A1A1AA] mb-1 block">Plan Tier</label>
+                    <select value={addForm.planTier} onChange={(e) => setAddForm({ ...addForm, planTier: e.target.value })}
+                      className="w-full h-9 text-sm rounded-xl bg-[#1a1a1d] border border-[#27272a] px-2 text-[#F5F5F5]">
+                      <option value="default">Default</option>
+                      <option value="starter">Starter</option>
+                      <option value="scale">Scale</option>
+                      <option value="enterprise">Enterprise</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-[#A1A1AA] mb-1 block">Markup %</label>
+                    <Input type="number" min="0" max="200" step="1" value={addForm.markup}
+                      onChange={(e) => setAddForm({ ...addForm, markup: e.target.value })} className="h-9" />
+                  </div>
+                </div>
+                {addError && <p className="text-xs text-[#EF4444]">{addError}</p>}
+                <div className="flex gap-2 pt-1">
+                  <Button variant="primary" size="sm" type="submit" disabled={addSaving} className="flex-1">
+                    {addSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <UserPlus className="w-3.5 h-3.5 mr-1.5" />}
+                    {addSaving ? "Adding…" : "Add Customer"}
+                  </Button>
+                  <Button variant="ghost" size="sm" type="button" onClick={() => setShowAddModal(false)}>Cancel</Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </Shell>
   );
 }

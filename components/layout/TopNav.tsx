@@ -118,6 +118,11 @@ export function TopNav() {
   // Dark mode toggle (visual only — already dark, could toggle class in future)
   const [isDark, setIsDark] = React.useState(true);
 
+  // Apply theme to <html> element
+  React.useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
+
   // Filtered search results
   const searchResults = React.useMemo(() => {
     if (!searchQuery.trim()) return [];
