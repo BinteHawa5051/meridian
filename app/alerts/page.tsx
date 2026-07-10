@@ -401,13 +401,36 @@ export default function AlertsPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <button
-                            onClick={() => handleDelete(rule.id)}
-                            className="p-1.5 rounded-lg hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
-                            aria-label="Delete rule"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => {
+                                const updated = prompt(
+                                  "Edit threshold ($):",
+                                  String(rule.thresholdUsd)
+                                );
+                                if (updated !== null && !isNaN(parseFloat(updated))) {
+                                  setRules((prev) =>
+                                    prev.map((r) =>
+                                      r.id === rule.id
+                                        ? { ...r, thresholdUsd: parseFloat(updated) }
+                                        : r
+                                    )
+                                  );
+                                }
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-chart-blue/10 text-meridian-text-muted hover:text-chart-blue transition-colors"
+                              aria-label="Edit rule"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(rule.id)}
+                              className="p-1.5 rounded-lg hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
+                              aria-label="Delete rule"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </TableCell>
                       </motion.tr>
                     );
