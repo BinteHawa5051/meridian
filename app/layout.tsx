@@ -5,7 +5,7 @@ import { Providers } from "./providers";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Meridian — AI Cost Control Platform",
+  title: "Meridian",
   description:
     "Set budgets that actually block calls. Meter usage your customers can audit. Bill them for it automatically.",
 };
