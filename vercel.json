@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm ci",
+  "installCommand": "npm install --no-package-lock",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": ".next",
   "regions": ["iad1"]
