@@ -36,6 +36,13 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "meridian-ingest-api.ts",
+    "meridian-worker.ts",
+    "meridian-anomaly.ts",
+    "meridian-pricing-updater.ts",
+    "meridian-retention.ts",
+    "meridian-stripe-retry.ts",
+    "meridian-sdk.ts"
   ]
 }

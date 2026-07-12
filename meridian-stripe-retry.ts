@@ -4,7 +4,7 @@
  * Max 5 retries — after that, marks as permanently failed.
  *
  * Usage:  npx tsx meridian-stripe-retry.ts
- * Cron:   */15 * * * *  (every 15 minutes)
+ * Cron:   every 15 minutes (0,15,30,45 * * * *)
  */
 
 import { Pool }  from "pg";

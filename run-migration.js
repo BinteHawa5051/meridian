@@ -1,17 +1,26 @@
 // Run from repo root: node run-migration.js
-// Uses dashboard/node_modules which has all required packages
 
+const fs   = require("fs");
 const path = require("path");
 
-// Point Node to dashboard node_modules
-const dashboardModules = path.join(__dirname, "node_modules");
-require("module").Module._nodeModulePaths = function() { return [dashboardModules]; };
+function loadEnvLocal() {
+  const envPath = path.join(__dirname, ".env.local");
+  if (!fs.existsSync(envPath)) return;
+  for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    if (!(key in process.env)) process.env[key] = val;
+  }
+}
 
-const dotenv = require(path.join(dashboardModules, "dotenv"));
-dotenv.config({ path: path.join(__dirname, ".env.local") });
+loadEnvLocal();
 
-const { Pool } = require(path.join(dashboardModules, "pg"));
-const bcrypt   = require(path.join(dashboardModules, "bcryptjs"));
+const { Pool } = require("pg");
+const bcrypt   = require("bcryptjs");
 
 const db = new Pool({ connectionString: process.env.DATABASE_URL });
 
