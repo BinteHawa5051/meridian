@@ -3,15 +3,30 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { createSession, getSessionCookieHeader } from "@/lib/auth";
 
-const DEV_LOGIN_EMAIL = "admin@meridian.dev";
-const DEV_LOGIN_PASSWORD = "Admin@1234";
-const DEV_USER = {
-  id: "00000000-0000-0000-0000-000000000001",
-  name: "Admin",
-  email: DEV_LOGIN_EMAIL,
-  role: "admin" as const,
-  orgId: "00000000-0000-0000-0000-000000000000",
-};
+const DEV_USERS = [
+  {
+    email: "admin@meridian.dev",
+    password: "Admin@1234",
+    user: {
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Admin",
+      email: "admin@meridian.dev",
+      role: "admin" as const,
+      orgId: "00000000-0000-0000-0000-000000000000",
+    },
+  },
+  {
+    email: "bintehawa5051@gmail.com",
+    password: "123456789",
+    user: {
+      id: "00000000-0000-0000-0000-000000000002",
+      name: "Binte Hawa",
+      email: "bintehawa5051@gmail.com",
+      role: "admin" as const,
+      orgId: "00000000-0000-0000-0000-000000000000",
+    },
+  },
+];
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,13 +38,13 @@ export async function POST(req: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Local dev fallback: allow the seeded demo account even when the DB is unavailable.
-    if (process.env.NODE_ENV !== "production" && normalizedEmail === DEV_LOGIN_EMAIL) {
-      const validDevPassword = password === DEV_LOGIN_PASSWORD;
-      if (validDevPassword) {
-        const token = await createSession(DEV_USER);
+    // Local dev fallback: allow the seeded demo accounts even when the DB is unavailable.
+    if (process.env.NODE_ENV !== "production") {
+      const devUser = DEV_USERS.find((u) => u.email === normalizedEmail);
+      if (devUser && password === devUser.password) {
+        const token = await createSession(devUser.user);
         return NextResponse.json(
-          { ok: true, user: DEV_USER },
+          { ok: true, user: devUser.user },
           { headers: { "Set-Cookie": getSessionCookieHeader(token) } }
         );
       }

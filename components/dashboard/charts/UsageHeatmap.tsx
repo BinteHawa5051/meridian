@@ -23,13 +23,13 @@ export function UsageHeatmap({ data }: UsageHeatmapProps) {
 
   const maxVal = Math.max(...heatmapData.map((d) => d.value));
 
-  const getColor = (value: number) => {
+  const getColorStyle = (value: number) => {
     const intensity = value / maxVal;
-    if (intensity < 0.2) return "bg-meridian-burgundy/10 dark:bg-meridian-bg-hover";
-    if (intensity < 0.4) return "bg-meridian-burgundy/25 dark:bg-meridian-burgundy/20";
-    if (intensity < 0.6) return "bg-meridian-burgundy/45 dark:bg-meridian-burgundy/35";
-    if (intensity < 0.8) return "bg-meridian-burgundy/65 dark:bg-meridian-burgundy/50";
-    return "bg-meridian-burgundy/85 dark:bg-meridian-burgundy/70";
+    if (intensity < 0.2) return { backgroundColor: "#1a1a1d" };
+    if (intensity < 0.4) return { backgroundColor: "rgba(122, 31, 52, 0.3)" };
+    if (intensity < 0.6) return { backgroundColor: "rgba(122, 31, 52, 0.5)" };
+    if (intensity < 0.8) return { backgroundColor: "rgba(122, 31, 52, 0.7)" };
+    return { backgroundColor: "rgba(122, 31, 52, 0.9)" };
   };
 
   if (!mounted) {
@@ -86,9 +86,9 @@ export function UsageHeatmap({ data }: UsageHeatmapProps) {
                       }}
                       className={cn(
                         "aspect-square rounded-sm border border-black/5 dark:border-white/5 transition-all duration-200",
-                        getColor(cell.value),
                         "hover:ring-1 hover:ring-meridian-burgundy-bright hover:scale-110 cursor-pointer"
                       )}
+                      style={getColorStyle(cell.value)}
                       title={`${DAY_LABELS[dayIdx]} ${HOUR_LABELS[hourIdx]}: ${cell.value} requests`}
                     />
                   ))}

@@ -12,6 +12,7 @@ import {
   Tooltip, ResponsiveContainer, Legend, Cell,
 } from "recharts";
 import { useTimeSeries, useBreakdown, useHeatmap } from "@/hooks/useMeridianData";
+import { generateSpendOverTime, generateAiCostBreakdown, generateTopModels, generateHeatmapData } from "@/lib/mock-data";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { formatCurrency, formatCompactNumber, formatCompactCurrency, cn } from "@/lib/utils";
 import {
@@ -73,16 +74,18 @@ function StatCard({ label, value, delta, icon: Icon, bg, text, delay }: {
 
 function HeatmapSection({ data }: { data?: Array<{ day: number; hour: number; value: number }> }) {
   const heatmapData = data ?? [];
-  const grouped = DAY_LABELS.map((_, d) => heatmapData.filter((x) => x.day === d));
+  const grouped = DAY_LABELS.map((_, dayIndex) =>
+    heatmapData.filter((d) => d.day === dayIndex)
+  );
   const maxVal = Math.max(...heatmapData.map((d) => d.value), 1);
 
-  function getColor(v: number) {
-    const i = v / maxVal;
-    if (i < 0.2) return "bg-[#1a1a1d]";
-    if (i < 0.4) return "bg-[#7A1F34]/20";
-    if (i < 0.6) return "bg-[#7A1F34]/35";
-    if (i < 0.8) return "bg-[#7A1F34]/55";
-    return "bg-[#7A1F34]/75";
+  function getColorStyle(value: number) {
+    const intensity = value / maxVal;
+    if (intensity < 0.2) return { backgroundColor: "#1a1a1d" };
+    if (intensity < 0.4) return { backgroundColor: "rgba(122, 31, 52, 0.3)" };
+    if (intensity < 0.6) return { backgroundColor: "rgba(122, 31, 52, 0.5)" };
+    if (intensity < 0.8) return { backgroundColor: "rgba(122, 31, 52, 0.7)" };
+    return { backgroundColor: "rgba(122, 31, 52, 0.9)" };
   }
 
   if (!heatmapData.length) {
@@ -91,37 +94,43 @@ function HeatmapSection({ data }: { data?: Array<{ day: number; hour: number; va
 
   return (
     <div className="overflow-x-auto scrollbar-hide">
-      <div className="flex gap-1 min-w-[600px]">
-        <div className="flex flex-col gap-1 pr-2 pt-8">
-          {DAY_LABELS.map((d) => (
-            <div key={d} className="h-3 text-[10px] text-[#71717A] text-right leading-3">{d}</div>
-          ))}
-        </div>
-        <div className="flex-1">
-          <div className="flex gap-1 mb-1">
-            {Array.from({ length: 24 }, (_, i) => (
-              <div key={i} className="flex-1 text-[8px] text-[#71717A] text-center h-8 leading-8">{i}h</div>
-            ))}
+      <div className="grid min-w-[840px] grid-cols-[3.5rem_repeat(24,minmax(0,1fr))] gap-1">
+        <div />
+        {Array.from({ length: 24 }, (_, i) => (
+          <div key={i} className="h-8 text-[8px] text-meridian-text-muted text-center leading-8">
+            {i}h
           </div>
-          {grouped.map((row, d) => (
-            <div key={d} className="flex gap-1 mb-1">
-              {row.map((cell) => (
-                <div
-                  key={cell.hour}
-                  className={cn("flex-1 aspect-square rounded-sm cursor-pointer hover:ring-1 hover:ring-[#A52D4F]", getColor(cell.value))}
-                  title={`${DAY_LABELS[d]} ${cell.hour}:00 — ${cell.value} req`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex items-center justify-end gap-2 mt-3">
-        <span className="text-[10px] text-[#71717A]">Low</span>
-        {[0.15, 0.30, 0.48, 0.62, 0.78].map((o) => (
-          <div key={o} className="w-3 h-3 rounded" style={{ backgroundColor: `rgba(122,31,52,${o})` }} />
         ))}
-        <span className="text-[10px] text-[#71717A]">High</span>
+
+        {grouped.map((row, dayIdx) => (
+          <React.Fragment key={dayIdx}>
+            <div className="h-3 text-[10px] text-meridian-text-muted leading-3 text-right pr-1 self-center">
+              {DAY_LABELS[dayIdx]}
+            </div>
+            {row.map((cell, hourIdx) => (
+              <div
+                key={`${dayIdx}-${hourIdx}`}
+                className="aspect-square rounded-sm border border-black/5 dark:border-white/5 transition-all duration-200 hover:ring-1 hover:ring-meridian-burgundy-bright hover:scale-110 cursor-pointer"
+                style={getColorStyle(cell.value)}
+                title={`${DAY_LABELS[dayIdx]} ${cell.hour}:00 — ${cell.value} req`}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-end gap-2 mt-3">
+        <span className="text-[10px] text-meridian-text-muted">Low</span>
+        {[0.15, 0.3, 0.45, 0.6, 0.75].map((intensity) => (
+          <div
+            key={intensity}
+            className="w-3 h-3 rounded"
+            style={{
+              backgroundColor: `rgba(122, 31, 52, ${intensity})`,
+            }}
+          />
+        ))}
+        <span className="text-[10px] text-meridian-text-muted">High</span>
       </div>
     </div>
   );
@@ -142,14 +151,15 @@ export default function UsagePage() {
   const { data: bkData,  isLoading: bkLoading  } = useBreakdown();
   const { data: hmData,  isLoading: hmLoading  } = useHeatmap();
 
-  const timeseries  = tsData?.timeseries  ?? [];
-  const byProvider  = bkData?.byProvider  ?? [];
-  const byModel     = bkData?.byModel     ?? [];
+  const timeseries  = tsData?.timeseries?.length ? tsData.timeseries : generateSpendOverTime();
+  const byProvider  = bkData?.byProvider?.length ? bkData.byProvider : generateAiCostBreakdown();
+  const byModel     = bkData?.byModel?.length ? bkData.byModel : generateTopModels();
+  const heatmapData = hmData?.heatmap?.length ? hmData.heatmap : generateHeatmapData();
 
   // Derived summary stats from timeseries
   const totalCost     = timeseries.reduce((s, d) => s + d.total, 0);
-  const totalRequests = (bkData?.byModel ?? []).reduce((s, m) => s + m.requests, 0);
-  const totalTokens   = (bkData?.byModel ?? []).reduce((s, m) => s + m.tokens,   0);
+  const totalRequests = byModel.reduce((s, m) => s + m.requests, 0);
+  const totalTokens   = byModel.reduce((s, m) => s + m.tokens,   0);
   const avgDailyCost  = timeseries.length ? totalCost / timeseries.length : 0;
 
   // Stacked area providers (keys present in data)
@@ -389,7 +399,7 @@ export default function UsagePage() {
             <CardContent>
               {hmLoading
                 ? <div className="skeleton h-40" />
-                : <HeatmapSection data={hmData?.heatmap} />}
+                : <HeatmapSection data={heatmapData} />}
             </CardContent>
           </Card>
         </TabsContent>

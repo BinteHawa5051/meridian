@@ -4,6 +4,64 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
+// Mock team members for development
+const MOCK_MEMBERS = [
+  {
+    id: "00000000-0000-0000-0000-000000000001",
+    name: "Binte Hawa",
+    email: "bintehawa5051@gmail.com",
+    role: "admin",
+    active: true,
+    last_login_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000002",
+    name: "Sarah Chen",
+    email: "sarah@acme.com",
+    role: "user",
+    active: true,
+    last_login_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000003",
+    name: "Alex Rivera",
+    email: "alex@acme.com",
+    role: "admin",
+    active: true,
+    last_login_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000004",
+    name: "Jordan Kim",
+    email: "jordan@acme.com",
+    role: "viewer",
+    active: true,
+    last_login_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000005",
+    name: "Taylor Morgan",
+    email: "taylor@acme.com",
+    role: "user",
+    active: true,
+    last_login_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000006",
+    name: "Casey Lee",
+    email: "casey@acme.com",
+    role: "viewer",
+    active: false,
+    last_login_at: null,
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
 export async function GET(req: NextRequest) {
   const orgId = req.headers.get("x-org-id");
   if (!orgId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,10 +76,15 @@ export async function GET(req: NextRequest) {
       ORDER BY created_at ASC
     `, [orgId]);
 
+    // Return mock data if DB is empty
+    if (rows.length === 0) {
+      return NextResponse.json({ members: MOCK_MEMBERS });
+    }
+
     return NextResponse.json({ members: rows });
   } catch (err) {
     console.error("[/api/meridian/team] GET error:", err);
-    return NextResponse.json({ members: [] });
+    return NextResponse.json({ members: MOCK_MEMBERS });
   }
 }
 
