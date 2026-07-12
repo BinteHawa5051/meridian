@@ -56,8 +56,13 @@ meridian/
 │   ├── reports/                    # Exportable CSV reports
 │   ├── api-keys/                   # Key creation & revocation
 │   ├── integrations/               # Provider connections
+│   ├── team/                       # Team member management
 │   ├── settings/                   # Org & profile settings
-│   └── api/meridian/               # Next.js API routes (DB-backed)
+│   ├── login/                      # Authentication page
+│   ├── register/                   # Registration page
+│   └── api/                        # API routes
+│       ├── auth/                   # Authentication endpoints
+│       └── meridian/               # Next.js API routes (DB-backed)
 │       ├── dashboard/              # Combined dashboard data (1 request)
 │       ├── summary/                # KPI cards
 │       ├── timeseries/             # Daily spend by provider
@@ -169,6 +174,10 @@ node seed-auth.js
 npm run dev        # http://localhost:3000
 ```
 
+**Dev Login Credentials** (for local development):
+- Email: `bintehawa5051@gmail.com` or `admin@meridian.dev`
+- Password: `123456789` or `Admin@1234`
+
 ### 6. Start the backend (optional)
 
 ```bash
@@ -196,6 +205,7 @@ npx tsx meridian-worker.ts
 | Reports | `/reports` | Download 5 CSV reports for any date range |
 | API Keys | `/api-keys` | Create, display prefix, revoke keys |
 | Integrations | `/integrations` | LLM provider + service connections |
+| Team | `/team` | Team member management, roles, invitations |
 | Settings | `/settings` | Org, profile, notifications, security |
 
 ---
@@ -240,6 +250,8 @@ const res = await ai.chat.completions.create({
 4. Add environment variables (see below)
 5. Deploy
 
+**Live Demo**: https://meridian-dashboard.vercel.app (if deployed)
+
 ### Backend → Railway
 
 Create 3 services with these start commands:
@@ -249,6 +261,12 @@ Create 3 services with these start commands:
 | Ingest API | `npx tsx meridian-ingest-api.ts` |
 | Worker | `npx tsx meridian-worker.ts` |
 | Anomaly Cron | `npx tsx meridian-anomaly.ts` |
+
+### Development Notes
+
+- The dashboard includes mock data fallbacks for development when the database is empty
+- Heatmap colors use inline styles for better browser compatibility
+- Dev login credentials are hardcoded in `app/api/auth/login/route.ts` for local testing
 
 ---
 
