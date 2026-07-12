@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { generateCustomerData } from "@/lib/mock-data";
+import { mockFallback } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -87,8 +87,15 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("[/api/meridian/customers] DB error, falling back to mock:", err);
+    const fallback = mockFallback.getCustomers();
     return NextResponse.json({
-      customers: generateCustomerData(),
+      customers: fallback.customers,
+      pagination: {
+        page,
+        limit,
+        total: fallback.customers.length,
+        totalPages: 1,
+      },
       generatedAt: new Date().toISOString(),
       _source: "mock",
     });

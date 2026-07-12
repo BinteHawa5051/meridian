@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 require("dotenv").config({ path: ".env.local" });
 
 async function main() {
@@ -11,6 +12,10 @@ async function main() {
 
   await db.query(
     "CREATE TABLE IF NOT EXISTS api_keys (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE, key_hash TEXT NOT NULL UNIQUE, key_prefix TEXT NOT NULL, name TEXT NOT NULL DEFAULT 'Default key', revoked_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())"
+  );
+
+  await db.query(
+    "CREATE TABLE IF NOT EXISTS users (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'user', avatar_url TEXT, active BOOLEAN NOT NULL DEFAULT TRUE, last_login_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())"
   );
 
   const orgSlug = "acme-demo";
@@ -31,7 +36,16 @@ async function main() {
     [orgId, keyHash, keyPrefix, "Copilot Seed Key"]
   );
 
-  console.log(JSON.stringify({ orgId, orgSlug, apiKey: rawKey }, null, 2));
+  const adminEmail = "admin@meridian.dev";
+  const adminPassword = "Admin@1234";
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
+
+  await db.query(
+    "INSERT INTO users (org_id, name, email, password_hash, role, active) VALUES ($1, $2, $3, $4, 'admin', TRUE) ON CONFLICT (email) DO UPDATE SET org_id = EXCLUDED.org_id, name = EXCLUDED.name, password_hash = EXCLUDED.password_hash, role = EXCLUDED.role, active = TRUE, updated_at = NOW()",
+    [orgId, "Admin", adminEmail, passwordHash]
+  );
+
+  console.log(JSON.stringify({ orgId, orgSlug, apiKey: rawKey, adminEmail, adminPassword }, null, 2));
   await db.end();
 }
 

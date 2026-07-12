@@ -1,15 +1,10 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { Shell } from "@/components/layout/Shell";
 import { KpiCards } from "@/components/dashboard/KpiCards";
-import { SpendAreaChart } from "@/components/dashboard/charts/SpendAreaChart";
-import { ModelBarChart } from "@/components/dashboard/charts/ModelBarChart";
-import { CostDonutChart } from "@/components/dashboard/charts/CostDonutChart";
-import { RevenueLineChart } from "@/components/dashboard/charts/RevenueLineChart";
-import { StackedBarChartComponent } from "@/components/dashboard/charts/StackedBarChart";
-import { UsageHeatmap } from "@/components/dashboard/charts/UsageHeatmap";
 import { CustomerProfitabilityTable } from "@/components/dashboard/customers/CustomerProfitabilityTable";
 import { BudgetEnforcementCards } from "@/components/dashboard/budget/BudgetEnforcementCards";
 import { LiveActivityFeed } from "@/components/dashboard/activity/LiveActivityFeed";
@@ -18,6 +13,31 @@ import { AiCostBreakdownComponent } from "@/components/dashboard/breakdown/AiCos
 import { SystemStatus } from "@/components/dashboard/status/SystemStatus";
 import { useSystemStatus } from "@/hooks/useMeridianData";
 import { useDashboard } from "@/hooks/useDashboard";
+
+const SpendAreaChart = dynamic(
+  () => import("@/components/dashboard/charts/SpendAreaChart").then((mod) => mod.SpendAreaChart),
+  { ssr: false }
+);
+const ModelBarChart = dynamic(
+  () => import("@/components/dashboard/charts/ModelBarChart").then((mod) => mod.ModelBarChart),
+  { ssr: false }
+);
+const CostDonutChart = dynamic(
+  () => import("@/components/dashboard/charts/CostDonutChart").then((mod) => mod.CostDonutChart),
+  { ssr: false }
+);
+const RevenueLineChart = dynamic(
+  () => import("@/components/dashboard/charts/RevenueLineChart").then((mod) => mod.RevenueLineChart),
+  { ssr: false }
+);
+const StackedBarChartComponent = dynamic(
+  () => import("@/components/dashboard/charts/StackedBarChart").then((mod) => mod.StackedBarChartComponent),
+  { ssr: false }
+);
+const UsageHeatmap = dynamic(
+  () => import("@/components/dashboard/charts/UsageHeatmap").then((mod) => mod.UsageHeatmap),
+  { ssr: false }
+);
 
 export default function DashboardPage() {
   // ONE network request instead of 10

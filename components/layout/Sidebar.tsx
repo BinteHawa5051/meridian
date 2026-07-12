@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_ITEMS } from "@/lib/constants";
@@ -34,10 +34,19 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar } = useDashboardStore();
   const { user, logout } = useAuth();
   const [orgExpanded, setOrgExpanded] = React.useState(true);
+
+  React.useEffect(() => {
+    for (const item of SIDEBAR_ITEMS) {
+      router.prefetch(item.href);
+    }
+    router.prefetch("/settings");
+    router.prefetch("/billing");
+  }, [router]);
 
   return (
     <motion.aside
@@ -81,7 +90,7 @@ export function Sidebar() {
           const allowed  = canAccess(user?.role as Role | undefined, item.href);
 
           return (
-            <Link key={item.href} href={allowed ? item.href : "#"}>
+            <Link key={item.href} href={allowed ? item.href : "#"} prefetch={allowed}>
               <motion.div
                 className={cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer group",
@@ -171,6 +180,7 @@ export function Sidebar() {
                     <div className="mt-1 pl-2 space-y-0.5">
                       <Link
                         href="/settings"
+                        prefetch
                         className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-meridian-bg-hover transition-colors text-xs text-meridian-text-muted hover:text-meridian-text-primary"
                       >
                         <Settings className="w-3.5 h-3.5" />
@@ -178,6 +188,7 @@ export function Sidebar() {
                       </Link>
                       <Link
                         href="/billing"
+                        prefetch
                         className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-meridian-bg-hover transition-colors text-xs text-meridian-text-muted hover:text-meridian-text-primary"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
@@ -214,6 +225,7 @@ export function Sidebar() {
               <div className="flex items-center gap-1 opacity-0 group-hover/profile:opacity-100 transition-opacity">
                 <Link
                   href="/settings"
+                  prefetch
                   className="p-1 rounded-md hover:bg-meridian-bg text-meridian-text-muted hover:text-meridian-text-primary transition-colors"
                   aria-label="Settings"
                   onClick={(e) => e.stopPropagation()}
@@ -222,6 +234,7 @@ export function Sidebar() {
                 </Link>
                 <Link
                   href="/"
+                  prefetch={false}
                   className="p-1 rounded-md hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
                   aria-label="Sign out"
                   onClick={(e) => { e.stopPropagation(); logout(); }}

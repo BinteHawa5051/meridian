@@ -66,7 +66,7 @@ export default function LoginPage() {
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
                 autoFocus
-                className="h-10 bg-[#1a1a1d] border-[#27272a] focus:border-[#7A1F34]/60"
+                className="h-10 bg-[#1a1a1d] border-[#27272a] text-[#f5f5f5] placeholder:text-[#71717A] caret-[#f5f5f5] focus:border-[#7A1F34]/60"
               />
             </div>
 
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
-                  className="h-10 bg-[#1a1a1d] border-[#27272a] focus:border-[#7A1F34]/60 pr-10"
+                  className="h-10 bg-[#1a1a1d] border-[#27272a] text-[#f5f5f5] placeholder:text-[#71717A] caret-[#f5f5f5] focus:border-[#7A1F34]/60 pr-10"
                 />
                 <button
                   type="button"

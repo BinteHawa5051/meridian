@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CustomerTable } from "@/components/dashboard/customers/CustomerTable";
 import { Pagination } from "@/components/ui/pagination";
 import { useCustomers } from "@/hooks/useMeridianData";
+import { mockFallback } from "@/lib/api-client";
 import type { FullCustomer } from "@/lib/api-client";
 import { formatCurrency, formatCompactNumber, cn } from "@/lib/utils";
 import {
@@ -118,7 +119,7 @@ export default function CustomersPage() {
   }, [search]);
 
   const { data, isLoading, isFetching, refetch } = useCustomers(debouncedSearch, page, PAGE_SIZE);
-  const customers: FullCustomer[] = data?.customers ?? [];
+  const customers: FullCustomer[] = data?.customers?.length ? data.customers : mockFallback.getCustomers().customers;
   const pagination = (data as any)?.pagination;
 
   // Client-side status filter

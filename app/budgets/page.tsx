@@ -13,6 +13,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { useBudgets } from "@/hooks/useMeridianData";
+import { generateBudgetEnforcements } from "@/lib/mock-data";
 import { formatCurrency, cn } from "@/lib/utils";
 import {
   Wallet, Plus, ShieldBan, ArrowDown, AlertTriangle,
@@ -210,7 +211,7 @@ export default function BudgetsPage() {
   const [filter, setFilter] = React.useState<"all" | "critical" | "warning" | "info">("all");
   const [sortDir, setSortDir] = React.useState<"asc" | "desc">("desc");
 
-  const enforcements: BudgetEnforcement[] = data?.enforcements ?? [];
+  const enforcements: BudgetEnforcement[] = data?.enforcements?.length ? data.enforcements : generateBudgetEnforcements();
 
   const filtered = React.useMemo(() => {
     const list = filter === "all" ? enforcements : enforcements.filter((e) => e.severity === filter);

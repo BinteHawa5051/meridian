@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Upload, X, CheckCircle2, Loader2, ImageIcon } from "lucide-react";
 
@@ -53,8 +54,7 @@ export function FileUpload({
       {/* Preview */}
       {preview && (
         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#27272a] bg-[#1a1a1d]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+          <Image src={preview} alt="Preview" fill className="object-cover" unoptimized />
           {status === "uploading" && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <Loader2 className="w-5 h-5 text-white animate-spin" />

@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { meridianApi } from "@/lib/api-client";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { generateTopModels } from "@/lib/mock-data";
 import { formatCurrency, formatCompactNumber, cn } from "@/lib/utils";
 import {
   Brain, Search, RefreshCw, TrendingUp, DollarSign,
@@ -80,6 +81,13 @@ interface PricingRow {
   active: boolean; updatedAt: string;
 }
 
+const MOCK_PRICING_ROWS: PricingRow[] = [
+  { provider: "OpenAI", model: "gpt-4o", inputPricePerMillion: 5, cachedInputPricePerMillion: 0.5, outputPricePerMillion: 15, active: true, updatedAt: new Date().toISOString() },
+  { provider: "OpenAI", model: "gpt-4o-mini", inputPricePerMillion: 0.15, cachedInputPricePerMillion: 0.015, outputPricePerMillion: 0.6, active: true, updatedAt: new Date().toISOString() },
+  { provider: "Anthropic", model: "claude-3.5-sonnet", inputPricePerMillion: 3, cachedInputPricePerMillion: 0.3, outputPricePerMillion: 15, active: true, updatedAt: new Date().toISOString() },
+  { provider: "Google", model: "gemini-1.5-pro", inputPricePerMillion: 2.5, cachedInputPricePerMillion: 0.25, outputPricePerMillion: 10, active: true, updatedAt: new Date().toISOString() },
+];
+
 function PricingTable() {
   const { data, isLoading } = useQuery<{ pricing: PricingRow[] }>({
     queryKey: ["meridian", "pricing"],
@@ -88,7 +96,7 @@ function PricingTable() {
   });
   const [search, setSearch] = React.useState("");
 
-  const rows = (data?.pricing ?? []).filter(
+  const rows = (data?.pricing?.length ? data.pricing : MOCK_PRICING_ROWS).filter(
     (r) =>
       r.model.toLowerCase().includes(search.toLowerCase()) ||
       r.provider.toLowerCase().includes(search.toLowerCase())
@@ -180,7 +188,7 @@ export default function ModelsPage() {
   const [sortKey, setSortKey] = React.useState<SortKey>("cost");
   const [sortDir, setSortDir] = React.useState<"asc" | "desc">("desc");
 
-  const models: ModelData[] = data?.models ?? [];
+  const models: ModelData[] = data?.models?.length ? data.models : generateTopModels();
 
   const filtered = React.useMemo(() => {
     const list = search

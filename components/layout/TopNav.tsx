@@ -115,22 +115,17 @@ export function TopNav() {
   const [notifications, setNotifications] = React.useState(NOTIFICATIONS);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Dark mode toggle (visual only — already dark, could toggle class in future)
-  const [isDark, setIsDark] = React.useState(true);
+  // Theme is persisted in localStorage so navigation/remounts do not snap back to dark.
+  const [theme, setTheme] = React.useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "dark";
+    return localStorage.getItem("theme") === "light" ? "light" : "dark";
+  });
 
-  // Load saved preference + apply on mount
+  // Apply theme to <html> element whenever it changes.
   React.useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    const dark = saved !== "light";
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-  }, []);
-
-  // Apply theme to <html> element
-  React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   // Filtered search results
   const searchResults = React.useMemo(() => {
@@ -358,11 +353,11 @@ export function TopNav() {
 
           {/* Theme toggle */}
           <button
-            onClick={() => setIsDark((v) => !v)}
+            onClick={() => setTheme((v) => (v === "dark" ? "light" : "dark"))}
             className="p-2 rounded-xl hover:bg-[#1a1a1d] transition-colors"
             aria-label="Toggle theme"
           >
-            {isDark
+            {theme === "dark"
               ? <Moon className="w-4 h-4 text-[#A1A1AA]" />
               : <Sun  className="w-4 h-4 text-[#A1A1AA]" />}
           </button>

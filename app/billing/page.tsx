@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useRevenue } from "@/hooks/useMeridianData";
+import { generateRevenueData } from "@/lib/mock-data";
 import { formatCurrency, formatCompactCurrency, formatRelativeTime, cn } from "@/lib/utils";
 import {
   CreditCard, DollarSign, TrendingUp, RefreshCw,
@@ -41,6 +42,42 @@ interface BillingStats {
   confirmedCount: number;
 }
 
+const MOCK_METER_EVENTS: MeterEvent[] = [
+  {
+    id: "me_001",
+    customerId: "cus_001",
+    llmEventId: "0f5a8d4e-6e32-4dd3-8dd2-4ebc1e4f00a1",
+    stripeEventId: "evt_1Pmock001",
+    amountUsd: 124.58,
+    status: "confirmed",
+    emittedAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    confirmedAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(),
+    retryCount: 0,
+  },
+  {
+    id: "me_002",
+    customerId: "cus_002",
+    llmEventId: "4e66a5b0-2e6f-4a19-8c4a-4f4f1dfe00b2",
+    stripeEventId: null,
+    amountUsd: 38.12,
+    status: "pending",
+    emittedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: null,
+    retryCount: 1,
+  },
+  {
+    id: "me_003",
+    customerId: "cus_003",
+    llmEventId: "b71c9f9f-8a1d-4af1-a2c0-0b4b1c5f00c3",
+    stripeEventId: "evt_1Pmock003",
+    amountUsd: 219.74,
+    status: "failed",
+    emittedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+    confirmedAt: null,
+    retryCount: 2,
+  },
+];
+
 // ─── Custom tooltip ───────────────────────────────────────────────────────────
 
 function ChartTooltip({ active, payload, label }: any) {
@@ -63,22 +100,27 @@ function ChartTooltip({ active, payload, label }: any) {
 
 export default function BillingPage() {
   const { data: revenueData, isLoading: revLoading } = useRevenue();
-  const [meterEvents, setMeterEvents] = React.useState<MeterEvent[]>([]);
-  const [stats, setStats] = React.useState<BillingStats>({ totalBilled: 0, pendingCount: 0, failedCount: 0, confirmedCount: 0 });
+  const [meterEvents, setMeterEvents] = React.useState<MeterEvent[]>(MOCK_METER_EVENTS);
+  const [stats, setStats] = React.useState<BillingStats>(() => ({
+    totalBilled: MOCK_METER_EVENTS.reduce((sum, event) => sum + event.amountUsd, 0),
+    pendingCount: MOCK_METER_EVENTS.filter((event) => event.status === "pending").length,
+    failedCount: MOCK_METER_EVENTS.filter((event) => event.status === "failed").length,
+    confirmedCount: MOCK_METER_EVENTS.filter((event) => event.status === "confirmed").length,
+  }));
   const [metersLoading, setMetersLoading] = React.useState(true);
 
   React.useEffect(() => {
     fetch("/api/meridian/billing")
       .then((r) => r.json())
       .then((d) => {
-        if (d.events) setMeterEvents(d.events);
-        if (d.stats)  setStats(d.stats);
+        if (d.events?.length) setMeterEvents(d.events);
+        if (d.stats) setStats(d.stats);
       })
       .catch(() => {})
       .finally(() => setMetersLoading(false));
   }, []);
 
-  const revenue = revenueData?.revenue ?? [];
+  const revenue = revenueData?.revenue?.length ? revenueData.revenue : generateRevenueData();
 
   // Running totals for the revenue chart
   const totalRevenue = revenue.reduce((s, r) => s + r.revenue, 0);

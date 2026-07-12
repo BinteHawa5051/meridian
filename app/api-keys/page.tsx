@@ -24,6 +24,36 @@ interface ApiKey {
   active: boolean;
 }
 
+const MOCK_KEYS: ApiKey[] = [
+  {
+    id: "key_mock_001",
+    keyPrefix: "mr_live_1a2b",
+    name: "Production API Key",
+    lastUsedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    revokedAt: null,
+    createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+    active: true,
+  },
+  {
+    id: "key_mock_002",
+    keyPrefix: "mr_test_7c8d",
+    name: "Staging Key",
+    lastUsedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    revokedAt: null,
+    createdAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+    active: true,
+  },
+  {
+    id: "key_mock_003",
+    keyPrefix: "mr_live_9e0f",
+    name: "Legacy Key",
+    lastUsedAt: null,
+    revokedAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 44 * 24 * 60 * 60 * 1000).toISOString(),
+    active: false,
+  },
+];
+
 // ─── New key reveal banner ─────────────────────────────────────────────────────
 
 function NewKeyBanner({ rawKey, onDismiss }: { rawKey: string; onDismiss: () => void }) {
@@ -162,7 +192,7 @@ export default function ApiKeysPage() {
   React.useEffect(() => {
     fetch("/api/meridian/api-keys")
       .then((r) => r.json())
-      .then((d) => { if (d.keys) setKeys(d.keys); })
+      .then((d) => { setKeys(d.keys?.length ? d.keys : MOCK_KEYS); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

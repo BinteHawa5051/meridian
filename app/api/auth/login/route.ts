@@ -3,12 +3,36 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { createSession, getSessionCookieHeader } from "@/lib/auth";
 
+const DEV_LOGIN_EMAIL = "admin@meridian.dev";
+const DEV_LOGIN_PASSWORD = "Admin@1234";
+const DEV_USER = {
+  id: "00000000-0000-0000-0000-000000000001",
+  name: "Admin",
+  email: DEV_LOGIN_EMAIL,
+  role: "admin" as const,
+  orgId: "00000000-0000-0000-0000-000000000000",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json() as { email: string; password: string };
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Local dev fallback: allow the seeded demo account even when the DB is unavailable.
+    if (process.env.NODE_ENV !== "production" && normalizedEmail === DEV_LOGIN_EMAIL) {
+      const validDevPassword = password === DEV_LOGIN_PASSWORD;
+      if (validDevPassword) {
+        const token = await createSession(DEV_USER);
+        return NextResponse.json(
+          { ok: true, user: DEV_USER },
+          { headers: { "Set-Cookie": getSessionCookieHeader(token) } }
+        );
+      }
     }
 
     // Look up user in DB
@@ -18,7 +42,7 @@ export async function POST(req: NextRequest) {
     }>(
       `SELECT u.id, u.name, u.email, u.password_hash, u.role, u.org_id
        FROM users u WHERE u.email = $1 AND u.active = TRUE`,
-      [email.toLowerCase().trim()]
+      [normalizedEmail]
     );
 
     if (rows.length === 0) {
