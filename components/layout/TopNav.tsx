@@ -342,7 +342,7 @@ export function TopNav() {
 
           {/* Docs */}
           <a
-            href="https://meridian.dev/docs"
+            href="https://github.com/BinteHawa5051/meridian"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex p-2 rounded-xl hover:bg-[#1a1a1d] transition-colors"
