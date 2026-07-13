@@ -15,6 +15,7 @@ export function hasRole(userRole: Role | undefined, required: Role): boolean {
 // Which pages each role can access
 export const ROUTE_ACCESS: Record<string, Role> = {
   "/dashboard":    "viewer",
+  "/user-dashboard": "user",
   "/usage":        "viewer",
   "/models":       "viewer",
   "/customers":    "user",
@@ -27,6 +28,7 @@ export const ROUTE_ACCESS: Record<string, Role> = {
   "/api-keys":     "admin",
   "/integrations": "admin",
   "/settings":     "admin",
+  "/admin":        "admin",
 };
 
 export function canAccess(userRole: Role | undefined, path: string): boolean {

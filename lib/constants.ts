@@ -69,6 +69,7 @@ export const SIDEBAR_ITEMS = [
   { label: "Team",         icon: "Users",            href: "/team"       },
   { label: "Reports",      icon: "FileText",         href: "/reports"    },
   { label: "Integrations", icon: "Puzzle",           href: "/integrations" },
+  { label: "Admin",        icon: "Shield",           href: "/admin",      adminOnly: true },
   { label: "Settings",     icon: "Settings",         href: "/settings"   },
 ];
 

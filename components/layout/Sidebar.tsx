@@ -88,13 +88,23 @@ export function Sidebar() {
           const Icon = iconMap[item.icon] || LayoutDashboard;
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const allowed  = canAccess(user?.role as Role | undefined, item.href);
+          const isAdminOnly = (item as any).adminOnly === true;
+          const isUserOnly = (item as any).userOnly === true;
+          const isAdmin = user?.role === "admin";
+          const isUser = user?.role === "user" || user?.role === "admin";
+
+          // Hide admin-only items for non-admin users
+          if (isAdminOnly && !isAdmin) return null;
+
+          // Hide user-only items for non-user roles
+          if (isUserOnly && !isUser) return null;
 
           return (
             <Link key={item.href} href={allowed ? item.href : "#"} prefetch={allowed}>
               <motion.div
                 className={cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer group",
-                  isActive ? "text-white" :
+                  isActive ? "text-meridian-text-primary dark:text-white" :
                   !allowed ? "text-meridian-text-muted/40 cursor-not-allowed" :
                   "text-meridian-text-muted hover:text-meridian-text-primary hover:bg-meridian-bg-hover"
                 )}
@@ -104,7 +114,7 @@ export function Sidebar() {
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute inset-0 bg-meridian-burgundy/20 rounded-xl border border-meridian-burgundy/30"
+                    className="absolute inset-0 bg-meridian-burgundy/10 dark:bg-meridian-burgundy/20 rounded-xl border border-meridian-burgundy/20 dark:border-meridian-burgundy/30"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -112,7 +122,7 @@ export function Sidebar() {
                   <div
                     className={cn(
                       "flex items-center justify-center w-5 h-5 shrink-0 transition-colors",
-                      isActive && "text-meridian-burgundy-bright"
+                      isActive && "text-meridian-burgundy dark:text-meridian-burgundy-bright"
                     )}
                   >
                     <Icon className="w-[18px] h-[18px]" />
@@ -204,9 +214,15 @@ export function Sidebar() {
 
         {/* User profile row */}
         <div className="relative group/profile">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-meridian-bg-hover transition-colors cursor-pointer">
+          <Link
+            href="/user-dashboard"
+            prefetch
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-meridian-bg-hover transition-colors cursor-pointer"
+          >
             <Avatar className="w-8 h-8 ring-2 ring-meridian-border group-hover/profile:ring-meridian-burgundy/40 transition-all shrink-0">
-              <AvatarFallback className="bg-meridian-burgundy text-white text-xs">TA</AvatarFallback>
+              <AvatarFallback className="bg-meridian-burgundy text-white text-xs">
+                {user?.name?.substring(0, 2).toUpperCase() ?? "TA"}
+              </AvatarFallback>
             </Avatar>
             <AnimatePresence>
               {!sidebarCollapsed && (
@@ -221,29 +237,26 @@ export function Sidebar() {
                 </motion.div>
               )}
             </AnimatePresence>
-            {!sidebarCollapsed && (
-              <div className="flex items-center gap-1 opacity-0 group-hover/profile:opacity-100 transition-opacity">
-                <Link
-                  href="/settings"
-                  prefetch
-                  className="p-1 rounded-md hover:bg-meridian-bg text-meridian-text-muted hover:text-meridian-text-primary transition-colors"
-                  aria-label="Settings"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href="/"
-                  prefetch={false}
-                  className="p-1 rounded-md hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
-                  aria-label="Sign out"
-                  onClick={(e) => { e.stopPropagation(); logout(); }}
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            )}
-          </div>
+          </Link>
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-1 opacity-0 group-hover/profile:opacity-100 transition-opacity absolute right-3 top-1/2 -translate-y-1/2">
+              <Link
+                href="/settings"
+                prefetch
+                className="p-1 rounded-md hover:bg-meridian-bg text-meridian-text-muted hover:text-meridian-text-primary transition-colors"
+                aria-label="Settings"
+              >
+                <Settings className="w-3.5 h-3.5" />
+              </Link>
+              <button
+                onClick={logout}
+                className="p-1 rounded-md hover:bg-chart-red/10 text-meridian-text-muted hover:text-chart-red transition-colors"
+                aria-label="Sign out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Collapse toggle */}

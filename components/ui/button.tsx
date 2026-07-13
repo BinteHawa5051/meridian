@@ -9,15 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-meridian-burgundy text-white hover:bg-meridian-burgundy-light active:bg-meridian-burgundy-bright shadow-lg shadow-meridian-burgundy/20 hover:shadow-meridian-burgundy/30 hover:scale-[1.02] active:scale-[0.98]",
+          "bg-meridian-burgundy text-white hover:bg-meridian-burgundy-light active:bg-meridian-burgundy-bright shadow-lg shadow-meridian-burgundy/20 hover:shadow-meridian-burgundy/30 hover:scale-[1.02] active:scale-[0.98] dark:shadow-meridian-burgundy/20 dark:hover:shadow-meridian-burgundy/30",
         secondary:
-          "bg-meridian-bg-hover text-meridian-text-primary hover:bg-meridian-bg-card border border-meridian-border hover:border-meridian-border-light active:scale-[0.98]",
+          "bg-meridian-bg-hover text-meridian-text-primary hover:bg-meridian-bg-card border border-meridian-border hover:border-meridian-border-light active:scale-[0.98] dark:bg-meridian-bg-hover dark:text-meridian-text-primary dark:hover:bg-meridian-bg-card dark:border-meridian-border dark:hover:border-meridian-border-light",
         ghost:
-          "text-meridian-text-secondary hover:text-meridian-text-primary hover:bg-meridian-bg-hover active:scale-[0.98]",
+          "text-meridian-text-secondary hover:text-meridian-text-primary hover:bg-meridian-bg-hover active:scale-[0.98] dark:text-meridian-text-secondary dark:hover:text-meridian-text-primary dark:hover:bg-meridian-bg-hover",
         outline:
-          "border border-meridian-border text-meridian-text-primary hover:bg-meridian-bg-hover hover:border-meridian-border-light active:scale-[0.98]",
+          "border border-meridian-border text-meridian-text-primary hover:bg-meridian-bg-hover hover:border-meridian-border-light active:scale-[0.98] dark:border-meridian-border dark:text-meridian-text-primary dark:hover:bg-meridian-bg-hover dark:hover:border-meridian-border-light",
         danger:
-          "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 active:scale-[0.98]",
+          "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 active:scale-[0.98] dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 dark:hover:bg-red-500/20",
       },
       size: {
         sm: "h-8 px-3 text-xs gap-1.5",

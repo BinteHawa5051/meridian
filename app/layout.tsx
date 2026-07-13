@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ChatWidget } from "@/components/ai/ChatWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body style={{ backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <ChatWidget />
+        </Providers>
       </body>
     </html>
   );

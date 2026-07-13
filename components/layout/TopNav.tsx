@@ -82,7 +82,7 @@ function Dropdown({
             exit={{ opacity: 0, y: 6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              "absolute top-full mt-2 z-[100] bg-[#141416] border border-[#27272a] rounded-xl shadow-2xl",
+              "absolute top-full mt-2 z-[100] bg-meridian-bg-card border border-meridian-border rounded-xl shadow-2xl",
               align === "right" ? "right-0" : "left-0"
             )}
           >
@@ -176,7 +176,7 @@ export function TopNav() {
   return (
     <header
       className={cn(
-        "fixed top-0 right-0 z-30 h-16 bg-[#09090b]/90 backdrop-blur-xl border-b border-[#27272a] transition-all duration-300",
+        "fixed top-0 right-0 z-30 h-16 bg-meridian-bg/90 backdrop-blur-xl border-b border-meridian-border transition-all duration-300",
         sidebarCollapsed ? "left-[72px]" : "left-[260px]"
       )}
     >
@@ -184,7 +184,7 @@ export function TopNav() {
 
         {/* ── Search ────────────────────────────────────────────────── */}
         <div className="flex-1 max-w-sm relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#71717A] pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-meridian-text-muted pointer-events-none" />
           <Input
             ref={searchRef}
             placeholder="Search pages…  ⌘K"
@@ -193,7 +193,7 @@ export function TopNav() {
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
             onKeyDown={handleSearchKey}
-            className="pl-9 h-9 text-sm bg-[#1a1a1d] border-[#27272a] hover:border-[#3f3f46] focus:border-[#7A1F34]/60 focus:ring-0"
+            className="pl-9 h-9 text-sm bg-meridian-bg-hover border-meridian-border hover:border-meridian-border-light focus:border-meridian-burgundy/60 focus:ring-0"
           />
           <AnimatePresence>
             {searchFocused && (searchQuery.length > 0 || true) && (
@@ -202,18 +202,18 @@ export function TopNav() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ duration: 0.12 }}
-                className="absolute top-full mt-1.5 left-0 right-0 bg-[#141416] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden z-[100]"
+                className="absolute top-full mt-1.5 left-0 right-0 bg-meridian-bg-card border border-meridian-border rounded-xl shadow-2xl overflow-hidden z-[100]"
               >
                 {searchQuery.length === 0 ? (
                   <div className="p-3">
-                    <p className="text-[10px] text-[#71717A] uppercase tracking-wider mb-2 px-1">Quick navigation</p>
+                    <p className="text-[10px] text-meridian-text-muted uppercase tracking-wider mb-2 px-1">Quick navigation</p>
                     {SEARCH_ITEMS.slice(0, 6).map((item) => (
                       <button
                         key={item.href}
                         onMouseDown={() => handleSearchSelect(item.href)}
-                        className="flex items-center gap-2 w-full px-2 py-2 rounded-lg hover:bg-[#1a1a1d] transition-colors text-left"
+                        className="flex items-center gap-2 w-full px-2 py-2 rounded-lg hover:bg-meridian-bg-hover transition-colors text-left"
                       >
-                        <span className="text-sm text-[#A1A1AA]">{item.label}</span>
+                        <span className="text-sm text-meridian-text-secondary">{item.label}</span>
                       </button>
                     ))}
                   </div>
@@ -223,15 +223,15 @@ export function TopNav() {
                       <button
                         key={item.href}
                         onMouseDown={() => handleSearchSelect(item.href)}
-                        className="flex items-center justify-between w-full px-3 py-2 rounded-lg hover:bg-[#1a1a1d] transition-colors text-left"
+                        className="flex items-center justify-between w-full px-3 py-2 rounded-lg hover:bg-meridian-bg-hover transition-colors text-left"
                       >
-                        <span className="text-sm text-[#F5F5F5]">{item.label}</span>
-                        <span className="text-[10px] text-[#71717A]">{item.category}</span>
+                        <span className="text-sm text-meridian-text-primary">{item.label}</span>
+                        <span className="text-[10px] text-meridian-text-muted">{item.category}</span>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="px-4 py-3 text-xs text-[#71717A]">No results for "{searchQuery}"</div>
+                  <div className="px-4 py-3 text-xs text-meridian-text-muted">No results for "{searchQuery}"</div>
                 )}
               </motion.div>
             )}
@@ -245,7 +245,7 @@ export function TopNav() {
           <Dropdown open={dateOpen} onClose={() => setDateOpen(false)}>
             <button
               onClick={() => { setDateOpen((v) => !v); setNotifsOpen(false); setProfileOpen(false); }}
-              className="flex items-center gap-1.5 h-8 px-2.5 rounded-xl hover:bg-[#1a1a1d] transition-colors text-xs text-[#A1A1AA]"
+              className="flex items-center gap-1.5 h-8 px-2.5 rounded-xl hover:bg-meridian-bg-hover transition-colors text-xs text-meridian-text-secondary"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">
@@ -261,8 +261,8 @@ export function TopNav() {
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     dateRange === range.value
-                      ? "bg-[#7A1F34]/20 text-[#A52D4F]"
-                      : "text-[#A1A1AA] hover:text-[#F5F5F5] hover:bg-[#1a1a1d]"
+                      ? "bg-meridian-burgundy/20 text-meridian-burgundy-bright"
+                      : "text-meridian-text-secondary hover:text-meridian-text-primary hover:bg-meridian-bg-hover"
                   )}
                 >
                   {range.label}
@@ -275,28 +275,28 @@ export function TopNav() {
           <Dropdown open={notifsOpen} onClose={() => setNotifsOpen(false)}>
             <button
               onClick={() => { setNotifsOpen((v) => !v); setDateOpen(false); setProfileOpen(false); }}
-              className="relative p-2 rounded-xl hover:bg-[#1a1a1d] transition-colors"
+              className="relative p-2 rounded-xl hover:bg-meridian-bg-hover transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-4 h-4 text-[#A1A1AA]" />
+              <Bell className="w-4 h-4 text-meridian-text-secondary" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[#7A1F34] rounded-full text-[9px] text-white flex items-center justify-center font-bold">
+                <span className="absolute top-1 right-1 w-4 h-4 bg-meridian-burgundy rounded-full text-[9px] text-white flex items-center justify-center font-bold">
                   {unreadCount}
                 </span>
               )}
             </button>
             <div className="w-80">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
-                <p className="text-sm font-semibold text-[#F5F5F5]">Notifications</p>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-meridian-border">
+                <p className="text-sm font-semibold text-meridian-text-primary">Notifications</p>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-[11px] text-[#7A1F34] hover:text-[#A52D4F] transition-colors">
+                  <button onClick={markAllRead} className="text-[11px] text-meridian-burgundy hover:text-meridian-burgundy-bright transition-colors">
                     Mark all read
                   </button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-xs text-[#71717A]">No notifications</div>
+                  <div className="px-4 py-8 text-center text-xs text-meridian-text-muted">No notifications</div>
                 ) : (
                   notifications.map((n) => {
                     const NIcon = notifIcons[n.severity];
@@ -304,21 +304,21 @@ export function TopNav() {
                       <div
                         key={n.id}
                         className={cn(
-                          "flex items-start gap-3 px-4 py-3 hover:bg-[#1a1a1d] transition-colors border-b border-[#1a1a1d] last:border-0",
-                          !n.read && "bg-[#7A1F34]/5"
+                          "flex items-start gap-3 px-4 py-3 hover:bg-meridian-bg-hover transition-colors border-b border-meridian-border last:border-0",
+                          !n.read && "bg-meridian-burgundy/5"
                         )}
                       >
                         <NIcon className={cn("w-3.5 h-3.5 mt-0.5 shrink-0", notifColors[n.severity])} />
                         <div className="flex-1 min-w-0">
-                          <p className={cn("text-xs font-medium", n.read ? "text-[#A1A1AA]" : "text-[#F5F5F5]")}>
+                          <p className={cn("text-xs font-medium", n.read ? "text-meridian-text-secondary" : "text-meridian-text-primary")}>
                             {n.title}
                           </p>
-                          <p className="text-[11px] text-[#71717A] mt-0.5 leading-relaxed">{n.body}</p>
-                          <p className="text-[10px] text-[#52525b] mt-1">{n.time}</p>
+                          <p className="text-[11px] text-meridian-text-muted mt-0.5 leading-relaxed">{n.body}</p>
+                          <p className="text-[10px] text-meridian-text-muted mt-1">{n.time}</p>
                         </div>
                         <button
                           onClick={() => dismissNotif(n.id)}
-                          className="p-0.5 rounded hover:bg-[#27272a] text-[#52525b] hover:text-[#A1A1AA] transition-colors shrink-0"
+                          className="p-0.5 rounded hover:bg-meridian-border text-meridian-text-muted hover:text-meridian-text-secondary transition-colors shrink-0"
                           aria-label="Dismiss"
                         >
                           <X className="w-3 h-3" />
@@ -328,11 +328,11 @@ export function TopNav() {
                   })
                 )}
               </div>
-              <div className="px-4 py-2.5 border-t border-[#27272a]">
+              <div className="px-4 py-2.5 border-t border-meridian-border">
                 <Link
                   href="/alerts"
                   onClick={() => setNotifsOpen(false)}
-                  className="text-xs text-[#7A1F34] hover:text-[#A52D4F] transition-colors"
+                  className="text-xs text-meridian-burgundy hover:text-meridian-burgundy-bright transition-colors"
                 >
                   View all alerts →
                 </Link>
@@ -345,24 +345,24 @@ export function TopNav() {
             href="https://github.com/BinteHawa5051/meridian"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex p-2 rounded-xl hover:bg-[#1a1a1d] transition-colors"
+            className="hidden sm:flex p-2 rounded-xl hover:bg-meridian-bg-hover transition-colors"
             aria-label="Documentation"
           >
-            <BookOpen className="w-4 h-4 text-[#A1A1AA]" />
+            <BookOpen className="w-4 h-4 text-meridian-text-secondary" />
           </a>
 
           {/* Theme toggle */}
           <button
             onClick={() => setTheme((v) => (v === "dark" ? "light" : "dark"))}
-            className="p-2 rounded-xl hover:bg-[#1a1a1d] transition-colors"
+            className="p-2 rounded-xl hover:bg-meridian-bg-hover transition-colors"
             aria-label="Toggle theme"
           >
             {theme === "dark"
-              ? <Moon className="w-4 h-4 text-[#A1A1AA]" />
-              : <Sun  className="w-4 h-4 text-[#A1A1AA]" />}
+              ? <Moon className="w-4 h-4 text-meridian-text-secondary" />
+              : <Sun  className="w-4 h-4 text-meridian-text-secondary" />}
           </button>
 
-          <div className="w-px h-5 bg-[#27272a] mx-1" />
+          <div className="w-px h-5 bg-meridian-border mx-1" />
 
           {/* New API Key */}
           <Button
@@ -379,24 +379,24 @@ export function TopNav() {
           <Dropdown open={profileOpen} onClose={() => setProfileOpen(false)}>
             <button
               onClick={() => { setProfileOpen((v) => !v); setDateOpen(false); setNotifsOpen(false); }}
-              className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl hover:bg-[#1a1a1d] transition-colors"
+              className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl hover:bg-meridian-bg-hover transition-colors"
               aria-label="User menu"
             >
               <Avatar className="w-7 h-7">
-                <AvatarFallback className="text-[10px] bg-[#7A1F34] text-white">
+                <AvatarFallback className="text-[10px] bg-meridian-burgundy text-white">
                   {user ? user.name.slice(0,2).toUpperCase() : "?"}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:block text-xs font-medium text-[#A1A1AA]">
+              <span className="hidden sm:block text-xs font-medium text-meridian-text-secondary">
                 {user?.name.split(" ")[0] ?? "Account"}
               </span>
-              <ChevronDown className="w-3 h-3 text-[#71717A] hidden sm:block" />
+              <ChevronDown className="w-3 h-3 text-meridian-text-muted hidden sm:block" />
             </button>
             <div className="w-56">
               {/* Profile header */}
-              <div className="px-4 py-3 border-b border-[#27272a]">
-                <p className="text-sm font-semibold text-[#F5F5F5]">{user?.name ?? "Account"}</p>
-                <p className="text-xs text-[#71717A] mt-0.5">{user?.email ?? ""}</p>
+              <div className="px-4 py-3 border-b border-meridian-border">
+                <p className="text-sm font-semibold text-meridian-text-primary">{user?.name ?? "Account"}</p>
+                <p className="text-xs text-meridian-text-muted mt-0.5">{user?.email ?? ""}</p>
                 <Badge variant="primary" className="mt-1.5 text-[10px] capitalize">{user?.role ?? "user"}</Badge>
               </div>
               {/* Menu items */}
@@ -405,7 +405,7 @@ export function TopNav() {
                   { icon: User,     label: "Profile",      href: "/settings"      },
                   { icon: Settings, label: "Settings",     href: "/settings"      },
                   { icon: Key,      label: "API Keys",     href: "/api-keys"      },
-                  { icon: BookOpen, label: "Documentation", href: "https://meridian.dev/docs", external: true },
+                  { icon: BookOpen, label: "Documentation", href: "https://github.com/BinteHawa5051/meridian", external: true },
                 ].map((item) => (
                   item.external ? (
                     <a
@@ -414,36 +414,36 @@ export function TopNav() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#1a1a1d] transition-colors w-full text-left"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-meridian-bg-hover transition-colors w-full text-left"
                     >
-                      <item.icon className="w-3.5 h-3.5 text-[#71717A]" />
-                      <span className="text-sm text-[#A1A1AA]">{item.label}</span>
-                      <ExternalLink className="w-3 h-3 text-[#52525b] ml-auto" />
+                      <item.icon className="w-3.5 h-3.5 text-meridian-text-muted" />
+                      <span className="text-sm text-meridian-text-secondary">{item.label}</span>
+                      <ExternalLink className="w-3 h-3 text-meridian-text-muted ml-auto" />
                     </a>
                   ) : (
                     <Link
                       key={item.label}
                       href={item.href}
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#1a1a1d] transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-meridian-bg-hover transition-colors"
                     >
-                      <item.icon className="w-3.5 h-3.5 text-[#71717A]" />
-                      <span className="text-sm text-[#A1A1AA]">{item.label}</span>
+                      <item.icon className="w-3.5 h-3.5 text-meridian-text-muted" />
+                      <span className="text-sm text-meridian-text-secondary">{item.label}</span>
                     </Link>
                   )
                 ))}
               </div>
               {/* Logout */}
-              <div className="p-1.5 border-t border-[#27272a]">
+              <div className="p-1.5 border-t border-meridian-border">
                 <button
                   onClick={() => {
                     setProfileOpen(false);
                     logout();
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#EF4444]/10 transition-colors w-full text-left"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-colors w-full text-left"
                 >
-                  <LogOut className="w-3.5 h-3.5 text-[#EF4444]" />
-                  <span className="text-sm text-[#EF4444]">Sign out</span>
+                  <LogOut className="w-3.5 h-3.5 text-red-500" />
+                  <span className="text-sm text-red-500">Sign out</span>
                 </button>
               </div>
             </div>

@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refresh } = useAuth();
   const [form, setForm] = React.useState({ email: "", password: "" });
   const [showPass, setShowPass] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -27,6 +29,10 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Login failed"); return; }
+
+      // Refresh auth context to get user data
+      await refresh();
+
       router.push("/dashboard");
       router.refresh();
     } catch {
